@@ -1,0 +1,157 @@
+/* 전체 채팅 컨테이너 */
+.chat-container {
+  width: 900px;
+  height: 90vh;
+  margin: 20px auto;
+  background: #ffffff;
+  display: flex;
+  flex-direction: column;
+  border-radius: 16px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.12);
+  overflow: hidden;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  position: relative;
+}
+
+/* 상단 헤더 */
+.chat-header {
+  width: 100%;
+  padding: 20px 24px;
+  background: #f7f8fa;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.chat-header h2 {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 700;
+  color: #222;
+}
+
+/* 나가기 버튼 */
+.logout-btn {
+  background: #e0e0e0;
+  color: #333;
+  padding: 8px 16px;
+  border-radius: 12px;
+  border: none;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: 0.2s;
+}
+.logout-btn:hover {
+  background: #d0d0d0;
+}
+
+/* 채팅 메시지 영역 */
+.chat-box {
+  flex: 1;
+  padding: 24px;
+  background: #f9f9f9;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 메시지 공통 스타일 */
+.chat-box > div {
+  max-width: 65%;
+  padding: 16px 20px;
+  border-radius: 20px;
+  font-size: 16px;
+  line-height: 1.5;
+  word-break: break-word;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+  position: relative;
+}
+
+/* 내 메시지 */
+.own {
+  align-self: flex-end;
+  background: #d9e8ff;
+  border: 1px solid #a7c6ff;
+  border-radius: 20px 20px 4px 20px;
+}
+
+/* 상대 메시지 */
+.chat-box > div:not(.own) {
+  align-self: flex-start;
+  background: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 20px 20px 20px 4px;
+}
+
+/* 닉네임 */
+.sender-name {
+  font-size: 13px;
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: #555;
+}
+
+/* 시간 */
+.time {
+  font-size: 12px;
+  color: #999;
+  margin-top: 6px;
+  text-align: right;
+}
+
+/* 입력 영역 */
+.input-area {
+  display: flex;
+  padding: 18px 24px;
+  background: #ffffff;
+  border-top: 1px solid #e6e6e6;
+  gap: 12px;
+}
+
+/* 입력창 */
+.input-area input {
+  flex: 1;
+  padding: 16px 20px;
+  font-size: 16px;
+  border-radius: 18px;
+  border: 1px solid #d0d0d0;
+  background: #f9f9f9;
+  transition: 0.2s;
+}
+.input-area input:focus {
+  outline: none;
+  border-color: #a7c6ff;
+  background: #ffffff;
+  box-shadow: 0 0 6px rgba(74,144,226,0.3);
+}
+
+/* 전송 버튼 */
+.input-area button {
+  padding: 16px 28px;
+  background: #4a90e2;
+  color: white;
+  border: none;
+  font-size: 16px;
+  border-radius: 18px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: 0.2s;
+}
+.input-area button:hover {
+  background: #357abd;
+}
+
+/* 스크롤바 */
+.chat-box::-webkit-scrollbar {
+  width: 8px;
+}
+.chat-box::-webkit-scrollbar-thumb {
+  background: #d0d0d0;
+  border-radius: 8px;
+}
+.chat-box::-webkit-scrollbar-track {
+  background: transparent;
+}

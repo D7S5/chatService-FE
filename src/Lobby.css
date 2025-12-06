@@ -1,0 +1,195 @@
+/* 전체 래퍼 */
+.lobby-wrapper {
+  max-width: 1200px;
+  margin: 40px auto;
+  font-family: "Pretendard", "Noto Sans KR", sans-serif;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* 헤더 */
+.lobby-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #ffffff;
+  padding: 20px 30px;
+  border-radius: 14px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+.lobby-header h2 {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 700;
+}
+
+.lobby-header .welcome {
+  font-size: 1rem;
+  color: #555;
+}
+
+.lobby-header button {
+  padding: 8px 16px;
+  border-radius: 10px;
+  border: none;
+  background: #4a90e2;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+.lobby-header button:hover {
+  background: #357abd;
+}
+
+/* 그리드 레이아웃 */
+.lobby-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 20px;
+}
+
+/* 카드 공통 */
+.card {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card h3 {
+  margin: 0 0 10px 0;
+  font-size: 1.2rem;
+  font-weight: 600;
+  border-bottom: 1px solid #eee;
+  padding-bottom: 6px;
+}
+
+/* 리스트 */
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 8px 12px;
+  border-radius: 10px;
+  background: #f9f9f9;
+  transition: 0.2s;
+}
+
+.list-item:hover {
+  background: #f0f0f0;
+}
+
+.list-item span {
+  font-weight: 500;
+  color: #333;
+}
+
+/* 버튼 */
+.join-btn, .dm-btn, .create-btn {
+  padding: 6px 12px;
+  border-radius: 8px;
+  border: none;
+  cursor: pointer;
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: 0.2s;
+}
+
+.join-btn {
+  background: #4a90e2;
+  color: white;
+}
+
+.join-btn:hover {
+  background: #357abd;
+}
+
+.dm-btn {
+  background: #7ed321;
+  color: white;
+}
+
+.dm-btn:hover {
+  background: #5ea017;
+}
+
+.create-btn {
+  background: #f5a623;
+  color: white;
+}
+
+.create-btn:hover {
+  background: #d4881e;
+}
+
+/* 입력폼 */
+.card form {
+  display: flex;
+  gap: 10px;
+}
+
+.card input[type="text"] {
+  flex: 1;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  font-size: 0.95rem;
+}
+
+/* DM 뱃지 */
+.dm-badge {
+  display: inline-block;
+  margin-left: 6px;
+  background: #FF3B30;
+  color: white;
+  font-size: 0.7rem;
+  font-weight: 600;
+  padding: 2px 6px;
+  border-radius: 8px;
+}
+
+/* 접속 상태 */
+.user-status {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 6px;
+}
+
+.user-online {
+  background: #4cd964;
+}
+
+.user-offline {
+  background: #bbb;
+}
+
+/* 비어있을 때 */
+.empty-text {
+  font-size: 0.9rem;
+  color: #888;
+}
+
+/* 오류 메시지 */
+.error-message {
+  color: #e74c3c;
+  font-weight: 600;
+  text-align: center;
+}

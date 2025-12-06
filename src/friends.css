@@ -1,0 +1,47 @@
+.friends-container {
+  width: 600px;
+  margin: 40px auto;
+  font-family: Arial;
+}
+
+.card {
+  background: #fff;
+  padding: 20px;
+  border-radius: 12px;
+  margin-bottom: 25px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.card h2 {
+  margin-bottom: 15px;
+}
+
+input {
+  width: 100%;
+  padding: 10px;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  margin-bottom: 10px;
+}
+
+button {
+  padding: 8px 14px;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  cursor: pointer;
+  margin-left: 10px;
+}
+
+.primary { background: #007bff; }
+.success { background: #28a745; }
+.danger  { background: #dc3545; }
+.warning { background: #ffc107; color: black; }
+
+.request-item,
+.friend-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid #eee;
+}
