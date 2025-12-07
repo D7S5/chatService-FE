@@ -33,7 +33,7 @@ const PrivateChat = () => {
     (async () => {
       try {
         await connectWebSocket((client) => {
-          client.subscribe(`/user/queue/messages`, (msg) => {
+          client.subscribe(`/user/queue/dm`, (msg) => {
             const body = JSON.parse(msg.body);
             if (body.senderId !== userId) {
               setMessages(prev => [...prev, body]);
@@ -56,7 +56,8 @@ const PrivateChat = () => {
     if (!input.trim()) return;
 
     const payload = {
-      room: { roomId },
+      roomId,
+      // room: { roomId }, // V1
       senderId: userId,
       content: input,
       sentAt: new Date().toISOString(),
@@ -65,7 +66,7 @@ const PrivateChat = () => {
     const client = getClient();
     if (client && client.connected) {
       client.publish({
-        destination: "/app/chat.private",
+        destination: "/app/dm.send",
         body: JSON.stringify(payload),
       });
 
