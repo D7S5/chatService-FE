@@ -60,7 +60,7 @@ const PrivateChat = () => {
       // room: { roomId }, // V1
       senderId: userId,
       content: input,
-      sentAt: new Date().toISOString(),
+      sentAt : Date.now(), // timestamp
     };
 
     const client = getClient();
@@ -69,11 +69,11 @@ const PrivateChat = () => {
         destination: "/app/dm.send",
         body: JSON.stringify(payload),
       });
-
+      
       // UI 즉시 반영
       setMessages(prev => [...prev, { ...payload, isRead: true }]);
     } else {
-      console.warn("WebSocket 미연결 상태");
+      console.warn("WebSocket 미연결 상태");  
     }
 
     setInput("");
@@ -100,7 +100,7 @@ const PrivateChat = () => {
             <div key={idx} className={`message-row ${isMine ? "my-message" : ""}`}>
               <div className="sender-name">{isMine ? "나" : username}</div>
               <div className="message-bubble">{msg.content}</div>
-              <div className="time">{msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ""}</div>
+            <div className="time">{msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ""}</div>
             </div>
           );
         })}
