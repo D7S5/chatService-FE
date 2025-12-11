@@ -243,6 +243,20 @@ const Lobby = () => {
   localStorage.clear();
   navigate("/");
 };
+
+async function logout() {
+  try {
+    await api.post("/auth/logout");
+  } catch (e) {
+    console.error("logout error:", e);
+  }
+
+  // AccessToken 제거
+  localStorage.removeItem("accessToken");
+
+  // 메인 페이지 이동
+  window.location.href = "/";
+}
   return (
     <div className="lobby-wrapper">
       <div className="lobby-header">
@@ -253,7 +267,7 @@ const Lobby = () => {
         <button onClick={() => navigate("/nickname")} style={{ marginLeft: "10px" }}>
           닉네임 변경
         </button>
-        <button onClick={handleLogout} className="logout-btn">
+        <button onClick={logout} className="logout-btn">
       로그아웃
     </button>
       </div>

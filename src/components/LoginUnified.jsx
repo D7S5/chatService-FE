@@ -18,15 +18,15 @@ const LoginUnified = ({ onLogin }) => {
     }
     try {
       const res = await api.post("/auth/login", { email, password });
-      const { accessToken, refreshToken, user } = res.data;
+      // const { accessToken, refreshToken, user } = res.data;
+      const { accessToken, user } = res.data;
 
       // 토큰만 저장, 닉네임은 아직 설정 안 됨
       localStorage.setItem("accessToken", accessToken);
-      localStorage.setItem("refreshToken", refreshToken);
+      // localStorage.setItem("refreshToken", refreshToken);
       localStorage.setItem("userId", user.id);        // UUID 저장
       localStorage.setItem("username", user.username);
 
-      // onLogin(null);  // username 아직 없음
       navigate("/lobby"); 
     } catch (err) {
       setError(err.response?.data?.message || "로그인 실패");

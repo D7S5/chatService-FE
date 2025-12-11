@@ -1,13 +1,7 @@
 import axios from "axios";
 import { toast } from "react-toastify";
 
-axios.defaults.withCredentials = true;
-
-const api = axios.create({ baseURL: "/api",
-                          withCredentials: true,
- });
-
-const isDev = process.env.NODE_ENV === "development";
+const api = axios.create({ baseURL: "/api" });
 
 // 토큰 재발행 중 여부
 let isRefreshing = false;
@@ -24,12 +18,16 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     const original = error.config;
-    
-    const status = error.response?.status;
 
     // 401 & 한 번도 리트라이 안 했을 때만
-    if (status === 401 && !original._retry) {
+    if (error.response?.status === 401 && !original._retry) {
       original._retry = true;
+
+      const refreshToken = localStorage.getItem("refreshToken");
+      if (!refreshToken) {
+        logout();
+        return Promise.reject(error);
+      }
 
       // 이미 다른 요청이 Refresh 중이면 큐에 넣기
       if (isRefreshing) {
@@ -45,11 +43,15 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
-        const res = await api.post("/auth/refresh");
-        const newAccess = res.data.accessToken;
+        const res = await axios.post("http://localhost:9090/api/auth/refresh", {
+          refreshToken,
+        });
 
+        const newAccess = res.data.accessToken;
+        const newRefresh = res.data.refreshToken;
 
         localStorage.setItem("accessToken", newAccess);
+        localStorage.setItem("refreshToken", newRefresh);
 
         // 큐 처리
         refreshQueue.forEach((cb) => cb(newAccess));
@@ -59,34 +61,19 @@ api.interceptors.response.use(
         // 원래 요청 재시도
         original.headers.Authorization = `Bearer ${newAccess}`;
         return api(original);
-
       } catch (err) {
         isRefreshing = false;
         refreshQueue = [];
-        
-        console.log("❌ Refresh 실패 → 로그아웃 처리 필요");
-
-        await logout();
-        return handleError(err)
+        logout();
+        return Promise.reject(err);
       }
     }
-    return handleError(error)
+
+    return Promise.reject(error);
   }
 );
 
-function handleError(error) {
-  if (isDev) {
-    return Promise.reject(error);
-  } else {
-    return Promise.resolve(null);
-  }
-
-}
-
-async function logout() {
-
-  await api.post("auth/logout")
-
+function logout() {
   localStorage.clear();
   window.location.href = "/";
 }

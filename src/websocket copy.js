@@ -34,12 +34,12 @@ async function createClient(onConnectCallback) {
 
     // 연결 성공 시
     onConnect: () => {
-      // console.log("WS Connected");  // debug
+      // console.log("WS Connected"); debug
 
       if (onConnectCallback) onConnectCallback(stompClient);
 
       setTimeout(() => {
-        // console.log("wsToken 만료 임박 → 재연결 시도"); // debug
+        // console.log("wsToken 만료 임박 → 재연결 시도"); debug
         reconnect(onConnectCallback);
       }, 110 * 1000);
     },
@@ -49,7 +49,7 @@ async function createClient(onConnectCallback) {
     },
 
     onWebSocketClose: () => {
-      // console.warn("WebSocket Closed"); // debug
+      // console.warn("WebSocket Closed"); debug
     }
   });
 
