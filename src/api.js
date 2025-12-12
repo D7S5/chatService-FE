@@ -1,4 +1,5 @@
 import axios from "axios";
+import { isTokenExpired } from "./jwtUtil";
 
 axios.defaults.withCredentials = true;
 
@@ -10,11 +11,54 @@ const api = axios.create({
 let isRefreshing = false;
 let refreshQueue = [];
 
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken");
-  if (token) config.headers.Authorization = `Bearer ${token}`;
-  return config;
-});
+let refreshingPromise = null;
+
+api.interceptors.request.use(
+  async (config) => {
+    const token = localStorage.getItem("accessToken");
+
+    // refresh 요청은 인터셉터에서 제외
+    if (config.url.includes("/auth/refresh")) {
+      return config;
+    }
+
+    if (token && isTokenExpired(token)) {
+      if (!refreshingPromise) {
+        refreshingPromise = api
+          .post("/auth/refresh", {}, { withCredentials: true })
+          .then((res) => {
+            const newToken = res.data.accessToken;
+            localStorage.setItem("accessToken", newToken);
+            return newToken;
+          })
+          .catch(() => {
+            localStorage.clear();
+            window.location.href = "/";
+          })
+          .finally(() => {
+            refreshingPromise = null;
+          });
+      }
+      const newToken = await refreshingPromise;
+      config.headers.Authorization = `Bearer ${newToken}`;
+      return config;
+    }
+
+    // 정상 token 붙이기
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
+    return config;
+  },
+  (error) => Promise.reject(error)
+);
+
+
+// api.interceptors.request.use((config) => {
+//   const token = localStorage.getItem("accessToken");
+//   if (token) config.headers.Authorization = `Bearer ${token}`;
+//   return config;
+// });
 
 api.interceptors.response.use(
   (response) => response,
@@ -38,6 +82,7 @@ api.interceptors.response.use(
       isRefreshing = true;
 
       try {
+
         const res = await api.post("/auth/refresh", {}, { withCredentials: true });
         const newAccess = res.data.accessToken;
         localStorage.setItem("accessToken", newAccess);

@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
-import { toast } from "react-toastify";
 import "../Login.css";
 
 const LoginUnified = ({ onLogin }) => {
@@ -17,14 +16,18 @@ const LoginUnified = ({ onLogin }) => {
       return;
     }
     try {
-      const res = await api.post("/auth/login", { email, password });
-      // const { accessToken, refreshToken, user } = res.data;
+      const res = await api.post(
+        "/auth/login",
+        { email, password },
+        { withCredentials: true }
+      );
+
       const { accessToken, user } = res.data;
 
-      // 토큰만 저장, 닉네임은 아직 설정 안 됨
+  
       localStorage.setItem("accessToken", accessToken);
-      // localStorage.setItem("refreshToken", refreshToken);
-      localStorage.setItem("userId", user.id);        // UUID 저장
+    
+      localStorage.setItem("userId", user.id);
       localStorage.setItem("username", user.username);
 
       navigate("/lobby"); 

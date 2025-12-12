@@ -122,62 +122,51 @@ const Lobby = () => {
     };
   }, [userId, username]);
 
-  /** API 로딩 함수들 */
-  const loadRooms = async () => {
-    try {
-      const res = await api.get("/rooms");
-      setRooms(res.data);
-    } catch {
-      setError("채팅방 목록 불러오기 실패");
-    }
-  };
+  const loadRooms = async () => {  
+    const res = await api.get("/rooms");
+    if (!res) return;
 
-  const loadDMRooms = async () => {
-    try {
-      const res = await api.get(`/dm/list/${userId}`);
-      setDMRooms(res.data);
-    } catch {
-      setError("DM 목록 불러오기 실패");
-    }
-  };
+    setRooms(res.data);
+};
+
+const loadDMRooms = async () => {
+  const res = await api.get(`/dm/list/${userId}`);
+  if (!res) return;
+
+  setDMRooms(res.data);
+};
 
   const loadFriends = async () => {
-    try {
-      const res = await api.get(`/user/friends/list/${userId}`  );
 
-      const friendsWithStatus = res.data.map((f) => ({
-        ...f,
-        online : !!onlineUsers[f.id]
-      }))
-      setFriends(friendsWithStatus);
-    } catch {
-      setError("친구 목록 불러오기 실패");
-    }
-  };
+  const res = await api.get(`/user/friends/list/${userId}`);
+  if (!res) return;
+
+  const friendsWithStatus = res.data.map((f) => ({
+    ...f,
+    online: !!onlineUsers[f.id],
+  }));
+  setFriends(friendsWithStatus);
+
+};
 
   const loadFriendRequests = async () => {
-    try {
-      const res = await api.get(`/user/friends/received/${userId}`);
-      setFriendRequests(res.data);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  const res = await api.get(`/user/friends/received/${userId}`);
+  if (!res) return;
 
+  setFriendRequests(res.data);
+};
   /** DM 시작 */
   const handleSendDM = async (targetUuid) => {
-    try {
       const res = await api.post("/dm/start", {
         userA: userId,
         userB: targetUuid,
       });
+      
+      if (!res) return ;
 
       navigate(`/dm/${res.data.roomId}`, {
         state: { userId, targetUuid },
       });
-    } catch {
-      setError("DM 시작 실패");
-    }
   };
 
   /** 친구 요청 */
