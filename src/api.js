@@ -1,15 +1,12 @@
 import axios from "axios";
-import { toast } from "react-toastify";
 
 axios.defaults.withCredentials = true;
 
-const api = axios.create({ baseURL: "/api",
-                          withCredentials: true,
- });
+const api = axios.create({
+  baseURL: "/api",
+  withCredentials: true,
+});
 
-const isDev = process.env.NODE_ENV === "development";
-
-// 토큰 재발행 중 여부
 let isRefreshing = false;
 let refreshQueue = [];
 
@@ -19,73 +16,59 @@ api.interceptors.request.use((config) => {
   return config;
 });
 
-// 응답 인터셉터
 api.interceptors.response.use(
   (response) => response,
+
   async (error) => {
     const original = error.config;
-    
     const status = error.response?.status;
 
-    // 401 & 한 번도 리트라이 안 했을 때만
     if (status === 401 && !original._retry) {
       original._retry = true;
 
-      // 이미 다른 요청이 Refresh 중이면 큐에 넣기
       if (isRefreshing) {
         return new Promise((resolve) => {
-          refreshQueue.push((token) => {
-            original.headers.Authorization = `Bearer ${token}`;
+          refreshQueue.push((newToken) => {
+            original.headers.Authorization = `Bearer ${newToken}`;
             resolve(api(original));
           });
         });
       }
 
-      // Refresh 시작
       isRefreshing = true;
 
       try {
-        const res = await api.post("/auth/refresh");
+        const res = await api.post("/auth/refresh", {}, { withCredentials: true });
         const newAccess = res.data.accessToken;
-
-
         localStorage.setItem("accessToken", newAccess);
-
-        // 큐 처리
+      
         refreshQueue.forEach((cb) => cb(newAccess));
         refreshQueue = [];
         isRefreshing = false;
 
-        // 원래 요청 재시도
         original.headers.Authorization = `Bearer ${newAccess}`;
         return api(original);
 
-      } catch (err) {
+      } catch (refreshError) {
         isRefreshing = false;
         refreshQueue = [];
-        
-        console.log("❌ Refresh 실패 → 로그아웃 처리 필요");
-
         await logout();
-        return handleError(err)
+
+        return Promise.resolve(null);
       }
     }
-    return handleError(error)
+    if (status === 401) {
+      return Promise.resolve(null);
+    }
+    return Promise.resolve(null);
   }
 );
 
-function handleError(error) {
-  if (isDev) {
-    return Promise.reject(error);
-  } else {
-    return Promise.resolve(null);
-  }
-
-}
-
+// 로그아웃
 async function logout() {
-
-  await api.post("auth/logout")
+  try {
+    await api.post("/auth/logout");
+  } catch (_) {}
 
   localStorage.clear();
   window.location.href = "/";

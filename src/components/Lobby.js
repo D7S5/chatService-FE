@@ -25,7 +25,6 @@ const Lobby = () => {
     // WebSocket 연결
     connectWebSocket((client) => {
       // 🔥 STOMP 연결 완료 후 실행됨
-      // console.log("WS connected in Lobby"); debug
 
       /** 1) 입장 이벤트 전송 */
       client.publish({
