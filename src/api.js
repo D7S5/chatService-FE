@@ -43,8 +43,7 @@ api.interceptors.request.use(
       config.headers.Authorization = `Bearer ${newToken}`;
       return config;
     }
-
-    // 정상 token 붙이기
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -110,7 +109,7 @@ api.interceptors.response.use(
 );
 
 // 로그아웃
-async function logout() {
+export async function logout() {
   try {
     await api.post("/auth/logout");
   } catch (_) {}

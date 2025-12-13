@@ -1,8 +1,9 @@
 import React, { useEffect, useRef, useState } from "react";
-import { json, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import "../Lobby.css";
-import api from "../api";
+import api, { logout } from "../api";
 import { connectWebSocket, getClient } from "../websocket";
+
 
 const Lobby = () => {
   const [rooms, setRooms] = useState([]);
@@ -76,7 +77,6 @@ const Lobby = () => {
         setRooms(JSON.parse(msg.body));
       });
 
-      /** 5) 친구 관련 구독 */
       client.subscribe(`/topic/friends/${userId}`, (msg) => {
         const payload = JSON.parse(msg.body);
 
@@ -85,7 +85,6 @@ const Lobby = () => {
       });
     });
 
-    // 데이터 로드
     loadRooms();
     loadDMRooms();
     loadFriends();
@@ -226,25 +225,7 @@ const loadDMRooms = async () => {
       setError("채팅방 생성 실패");
     }
   };
-  
-  const handleLogout = () => {
-  localStorage.clear();
-  navigate("/");
-};
 
-async function logout() {
-  try {
-    await api.post("/auth/logout");
-  } catch (e) {
-    console.error("logout error:", e);
-  }
-
-  // AccessToken 제거
-  localStorage.removeItem("accessToken");
-
-  // 메인 페이지 이동
-  window.location.href = "/";
-}
   return (
     <div className="lobby-wrapper">
       <div className="lobby-header">
