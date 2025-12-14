@@ -1,0 +1,73 @@
+/* 공통 컨테이너 */
+.login-container {
+  max-width: 500px;
+  margin: 5px auto;
+  padding: 32px;
+  background: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  text-align: center;
+}
+
+/* 제목 */
+.login-container h2 {
+  margin-bottom: 24px;
+  font-size: 1.5rem;
+  font-weight: 500;
+  color: #222;
+}
+
+/* 입력창 */
+.login-container input {
+  width: 100%;
+  padding: 12px 14px;
+  font-size: 1rem;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  outline: none;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.login-container input:focus {
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.15);
+}
+
+/* 버튼 */
+.login-container button {
+  width: 100%;
+  margin-top: 20px;
+  padding: 12px;
+  border: none;
+  border-radius: 8px;
+  background: #4f46e5;
+  color: #fff;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.login-container button:hover {
+  background: #4338ca;
+}
+
+.login-container button:active {
+  transform: scale(0.98);
+}
+
+/* 성공 메시지 */
+.success-message {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #16a34a;
+  font-weight: 500;
+}
+
+/* 에러 메시지 */
+.error {
+  margin-top: 10px;
+  font-size: 0.9rem;
+  color: #dc2626;
+  font-weight: 500;
+}

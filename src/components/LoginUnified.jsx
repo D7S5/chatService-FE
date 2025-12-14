@@ -3,18 +3,19 @@ import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
 import "../Login.css";
 
-const LoginUnified = ({ onLogin }) => {
+const LoginUnified = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
+  /* -------------------------------
+     일반 이메일 로그인
+  -------------------------------- */
   const handleEmailLogin = async (e) => {
     e.preventDefault();
-    if (!email.trim() || !password) {
-      setError("이메일과 비밀번호를 모두 입력하세요.");
-      return;
-    }
+    setError("");
+
     try {
       const res = await api.post(
         "/auth/login",
@@ -24,21 +25,29 @@ const LoginUnified = ({ onLogin }) => {
 
       const { accessToken, user } = res.data;
 
-  
       localStorage.setItem("accessToken", accessToken);
-    
       localStorage.setItem("userId", user.id);
       localStorage.setItem("username", user.username);
 
-      navigate("/lobby"); 
+      navigate("/lobby");
     } catch (err) {
       setError(err.response?.data?.message || "로그인 실패");
     }
   };
 
+  /* -------------------------------
+     OAuth 로그인 (리다이렉트)
+  -------------------------------- */
+  const handleOAuthLogin = (provider) => {
+    const baseUrl = process.env.REACT_APP_API_BASE || "http://localhost:9090";
+    window.location.href = `${baseUrl}/oauth2/authorization/${provider}`;
+  };
+
   return (
     <div className="login-container">
       <h2>로그인</h2>
+
+      {/* 이메일 로그인 */}
       <form onSubmit={handleEmailLogin} className="login-form">
         <input
           type="email"
@@ -54,9 +63,31 @@ const LoginUnified = ({ onLogin }) => {
           onChange={(e) => setPassword(e.target.value)}
           required
         />
+
         {error && <p className="error-message">{error}</p>}
-        <button type="submit">로그인</button>
+
+        <button type="submit">이메일 로그인</button>
       </form>
+
+      <div className="divider">또는</div>
+
+      {/* OAuth 로그인 */}
+      <div className="oauth-buttons">
+        {/* <button
+          className="oauth-btn google"
+          onClick={() => handleOAuthLogin("google")}
+        >
+          Google로 로그인
+        </button> */}
+
+        <button
+          className="oauth-btn naver"
+          onClick={() => handleOAuthLogin("naver")}
+        >
+          네이버로 로그인
+        </button>
+      </div>
+
       <p>
         회원이 아니신가요? <Link to="/signup">회원가입</Link>
       </p>

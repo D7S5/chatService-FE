@@ -9,6 +9,8 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import PrivateChat from "./components/PrivateChat";
 import DMList from "./components/DMList";
+import OAuthNickname from "./components/OAuthNickname";
+import OAuthRedirect from "./components/OauthRedirect";
 
 function App() {
   const [username, setUsername] = useState(() => localStorage.getItem("username"));
@@ -25,8 +27,8 @@ function App() {
         <Route path="/chat/:roomId" element={<Chat />} />
         <Route path="/dm/list" element={<DMList />} />
         <Route path="/dm/:roomId" element={<PrivateChat />} />
-        {/* <Route path="/dm/:targetUser" element={<PrivateChat />} /> */}
-        {/* <Route path="*" element={<Navigate to="/" />} /> */}
+        <Route path="/oauth/success" element={<OAuthRedirect />} />
+        <Route path="/oauth/nickname" element={<OAuthNickname />} />
       </Routes>
     </Router>
   );

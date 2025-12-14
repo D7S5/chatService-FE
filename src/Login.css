@@ -63,3 +63,33 @@
   color: #666;
   font-size: 14px;
 }
+
+.divider {
+  margin: 16px 0;
+  text-align: center;
+  color: #888;
+}
+
+.oauth-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.oauth-btn {
+  padding: 10px;
+  border-radius: 6px;
+  border: none;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.oauth-btn.google {
+  background: #ffffff;
+  border: 1px solid #ddd;
+}
+
+.oauth-btn.naver {
+  background: #03c75a;
+  color: white;
+}
