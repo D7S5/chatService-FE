@@ -194,6 +194,17 @@ const loadDMRooms = async () => {
     }
   };
 
+  const removeFriend = async (targetId) => {
+  if (!window.confirm("정말 친구를 끊을까요?")) return;
+
+  try {
+    await api.delete(`/user/friends/${targetId}`);
+    setFriends(prev => prev.filter(f => f.id !== targetId));
+  } catch {
+    alert("친구 끊기 실패");
+  }
+};
+
   /** 친구 요청 거절 */
   const rejectFriendRequest = async (requestId) => {
     try {
@@ -360,6 +371,12 @@ const loadDMRooms = async () => {
 
                   <button className="dm-btn" onClick={() => handleSendDM(user.id)}>
                     DM
+                  </button>
+                  <button
+                    className="danger-btn"
+                    onClick={() => removeFriend(user.id)}
+                  >
+                    친구 끊기
                   </button>
                 </li>
               ))}

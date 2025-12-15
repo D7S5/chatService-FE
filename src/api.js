@@ -98,13 +98,13 @@ api.interceptors.response.use(
         refreshQueue = [];
         await logout();
 
-        return Promise.resolve(null);
+        return Promise.reject(error);
       }
     }
     if (status === 401) {
-      return Promise.resolve(null);
+      return Promise.reject(error);
     }
-    return Promise.resolve(null);
+    return Promise.reject(error);
   }
 );
 

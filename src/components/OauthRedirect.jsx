@@ -1,24 +1,36 @@
 import { useEffect } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+import api from "../api";
 
 export default function OAuthRedirect() {
-  const [params] = useSearchParams();
   const navigate = useNavigate();
+  const [params] = useSearchParams();
 
   useEffect(() => {
-    const token = params.get("token");
-    if (!token) return;
+    const load = async () => {
+      const token = params.get("token");
+      if (!token) {
+        navigate("/");
+        return;
+      }
 
-    localStorage.setItem("accessToken", token);
+      // 🔥 반드시 먼저 저장
+      localStorage.setItem("accessToken", token);
 
-    const payload = JSON.parse(atob(token.split(".")[1]));
+      try {
+        const res = await api.get("/me");
+        navigate(
+          res.data.nicknameCompleted
+            ? "/lobby"
+            : "/oauth/nickname"
+        );
+      } catch {
+        navigate("/");
+      }
+    };
 
-    if (!payload.nicknameCompleted) {
-      navigate("/oauth/nickname");
-    } else {
-      navigate("/lobby");
-    }
-  }, []);
+    load();
+}, [params, navigate]);
 
   return null;
 }
