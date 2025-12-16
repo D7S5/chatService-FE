@@ -19,6 +19,10 @@ export default function OAuthRedirect() {
 
       try {
         const res = await api.get("/me");
+
+        localStorage.setItem("userId" , res.data.id)
+        localStorage.setItem("username", res.data.username)
+        
         navigate(
           res.data.nicknameCompleted
             ? "/lobby"

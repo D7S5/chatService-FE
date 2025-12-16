@@ -1,5 +1,4 @@
 import axios from "axios";
-import { isTokenExpired } from "./jwtUtil";
 
 axios.defaults.withCredentials = true;
 
@@ -8,57 +7,49 @@ const api = axios.create({
   withCredentials: true,
 });
 
-let isRefreshing = false;
-let refreshQueue = [];
+/**
+ * refresh 상태 관리
+ */
+let refreshPromise = null;
+let requestQueue = [];
 
-let refreshingPromise = null;
+/**
+ * queue 처리
+ */
+function resolveQueue(token) {
+  requestQueue.forEach(p => p.resolve(token));
+  requestQueue = [];
+}
 
+function rejectQueue(error) {
+  requestQueue.forEach(p => p.reject(error));
+  requestQueue = [];
+}
+
+/**
+ * =========================
+ * REQUEST INTERCEPTOR
+ * =========================
+ */
 api.interceptors.request.use(
-  async (config) => {
+  (config) => {
     const token = localStorage.getItem("accessToken");
 
-    // refresh 요청은 인터셉터에서 제외
-    if (config.url.includes("/auth/refresh")) {
-      return config;
-    }
-
-    if (token && isTokenExpired(token)) {
-      if (!refreshingPromise) {
-        refreshingPromise = api
-          .post("/auth/refresh", {}, { withCredentials: true })
-          .then((res) => {
-            const newToken = res.data.accessToken;
-            localStorage.setItem("accessToken", newToken);
-            return newToken;
-          })
-          .catch(() => {
-            localStorage.clear();
-            window.location.href = "/";
-          })
-          .finally(() => {
-            refreshingPromise = null;
-          });
-      }
-      const newToken = await refreshingPromise;
-      config.headers.Authorization = `Bearer ${newToken}`;
-      return config;
-    }
-    
     if (token) {
+      config.headers = config.headers || {};
       config.headers.Authorization = `Bearer ${token}`;
     }
+
     return config;
   },
   (error) => Promise.reject(error)
 );
 
-
-// api.interceptors.request.use((config) => {
-//   const token = localStorage.getItem("accessToken");
-//   if (token) config.headers.Authorization = `Bearer ${token}`;
-//   return config;
-// });
-
+/**
+ * =========================
+ * RESPONSE INTERCEPTOR
+ * =========================
+ */
 api.interceptors.response.use(
   (response) => response,
 
@@ -66,49 +57,63 @@ api.interceptors.response.use(
     const original = error.config;
     const status = error.response?.status;
 
-    if (status === 401 && !original._retry) {
-      original._retry = true;
-
-      if (isRefreshing) {
-        return new Promise((resolve) => {
-          refreshQueue.push((newToken) => {
-            original.headers.Authorization = `Bearer ${newToken}`;
-            resolve(api(original));
-          });
-        });
-      }
-
-      isRefreshing = true;
-
-      try {
-
-        const res = await api.post("/auth/refresh", {}, { withCredentials: true });
-        const newAccess = res.data.accessToken;
-        localStorage.setItem("accessToken", newAccess);
-      
-        refreshQueue.forEach((cb) => cb(newAccess));
-        refreshQueue = [];
-        isRefreshing = false;
-
-        original.headers.Authorization = `Bearer ${newAccess}`;
-        return api(original);
-
-      } catch (refreshError) {
-        isRefreshing = false;
-        refreshQueue = [];
-        await logout();
-
-        return Promise.reject(error);
-      }
-    }
-    if (status === 401) {
+    if (!original) {
       return Promise.reject(error);
     }
-    return Promise.reject(error);
+
+    const isAuthApi =
+      original.url?.includes("/auth/login") ||
+      original.url?.includes("/auth/refresh") ||
+      original.url?.includes("/auth/register") ||
+      original.url?.includes("/auth/oauth");
+
+    if (status !== 401 || isAuthApi || original._retry) {
+      return Promise.reject(error);
+    }
+
+    original._retry = true;
+
+    if (refreshPromise) {
+      return new Promise((resolve, reject) => {
+        requestQueue.push({
+          resolve: (token) => {
+            original.headers = original.headers || {};
+            original.headers.Authorization = `Bearer ${token}`;
+            resolve(api(original));
+          },
+          reject,
+        });
+      });
+    }
+
+    /**
+     * refresh 시작
+     */
+    refreshPromise = api
+      .post("/auth/refresh")
+      .then((res) => {
+        const newToken = res.data.accessToken;
+        localStorage.setItem("accessToken", newToken);
+        resolveQueue(newToken);
+        return newToken;
+      })
+      .catch((err) => {
+        rejectQueue(err);
+        logout();
+        throw err;
+      })
+      .finally(() => {
+        refreshPromise = null;
+      });
+
+    const newToken = await refreshPromise;
+
+    original.headers = original.headers || {};
+    original.headers.Authorization = `Bearer ${newToken}`;
+    return api(original);
   }
 );
 
-// 로그아웃
 export async function logout() {
   try {
     await api.post("/auth/logout");
