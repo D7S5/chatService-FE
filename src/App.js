@@ -18,7 +18,6 @@ function App() {
   return (
     <Router>
       <ToastContainer position="top-center" autoClose={2000} />
-      {/* {username && <button onClick={handleLogout}>로그아웃</button>} */}
       <Routes>
         <Route path="/" element={<LoginUnified onLogin={() => setUsername(null)} />} />
         <Route path="/signup" element={<Signup />} />

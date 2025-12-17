@@ -7,15 +7,11 @@ const api = axios.create({
   withCredentials: true,
 });
 
-/**
- * refresh 상태 관리
- */
+
 let refreshPromise = null;
 let requestQueue = [];
 
-/**
- * queue 처리
- */
+
 function resolveQueue(token) {
   requestQueue.forEach(p => p.resolve(token));
   requestQueue = [];
@@ -26,11 +22,6 @@ function rejectQueue(error) {
   requestQueue = [];
 }
 
-/**
- * =========================
- * REQUEST INTERCEPTOR
- * =========================
- */
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("accessToken");
@@ -45,11 +36,6 @@ api.interceptors.request.use(
   (error) => Promise.reject(error)
 );
 
-/**
- * =========================
- * RESPONSE INTERCEPTOR
- * =========================
- */
 api.interceptors.response.use(
   (response) => response,
 
@@ -86,9 +72,6 @@ api.interceptors.response.use(
       });
     }
 
-    /**
-     * refresh 시작
-     */
     refreshPromise = api
       .post("/auth/refresh")
       .then((res) => {

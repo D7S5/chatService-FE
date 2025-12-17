@@ -1,0 +1,8 @@
+.naver-login-btn {
+  width: 320px;        /* ← 여기서 줄이기 */
+  max-width: 180%;
+  height: auto;        /* 비율 유지 */
+  cursor: pointer;
+  display: block;
+  margin: 14px auto;
+}

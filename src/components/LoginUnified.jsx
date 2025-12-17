@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
+import NaverLoginButton from "../oauth/NaverLoginButton";
 import "../Login.css";
 
 const LoginUnified = () => {
@@ -68,24 +69,10 @@ const LoginUnified = () => {
 
         <button type="submit">이메일 로그인</button>
       </form>
-
       <div className="divider">또는</div>
-
       {/* OAuth 로그인 */}
       <div className="oauth-buttons">
-        {/* <button
-          className="oauth-btn google"
-          onClick={() => handleOAuthLogin("google")}
-        >
-          Google로 로그인
-        </button> */}
-
-        <button
-          className="oauth-btn naver"
-          onClick={() => handleOAuthLogin("naver")}
-        >
-          네이버로 로그인
-        </button>
+        <NaverLoginButton />
       </div>
 
       <p>
