@@ -2,7 +2,9 @@ import React, { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import api from "../api";
 import NaverLoginButton from "../oauth/NaverLoginButton";
+import GoogleLoginButton from "../oauth/GoogleLoginButton";
 import "../Login.css";
+import KakaoLoginButton from "../oauth/KakaoLoginButton";
 
 const LoginUnified = () => {
   const [email, setEmail] = useState("");
@@ -69,12 +71,14 @@ const LoginUnified = () => {
 
         <button type="submit">이메일 로그인</button>
       </form>
-      <div className="divider">또는</div>
-      {/* OAuth 로그인 */}
-      <div className="oauth-buttons">
-        <NaverLoginButton />
-      </div>
 
+      <div className="divider">또는</div>
+
+      <div className="oauth-buttons">
+      <GoogleLoginButton />
+      <NaverLoginButton />
+      <KakaoLoginButton />
+      </div>
       <p>
         회원이 아니신가요? <Link to="/signup">회원가입</Link>
       </p>

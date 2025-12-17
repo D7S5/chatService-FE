@@ -1,4 +1,4 @@
-import naverLoginBtn from "../assets/NAVER_login_Light_KR_green_wide_H56.png";
+import naverLoginBtn from "../assets/NAVER_login_Dark_KR_green_icon_H56.png";
 import './NaverLoginButton.css'
 
 
