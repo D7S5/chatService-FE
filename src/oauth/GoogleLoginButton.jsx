@@ -1,6 +1,6 @@
 import React from "react";
 import googleIcon from "../assets/web_light.png"; 
-import "./OAuthButton.css";
+import "./GoogleLoginButton.css";
 
 const GoogleLoginButton = () => {
   const handleLogin = () => {
