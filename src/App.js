@@ -11,6 +11,7 @@ import PrivateChat from "./components/PrivateChat";
 import DMList from "./components/DMList";
 import OAuthNickname from "./components/OAuthNickname";
 import OAuthRedirect from "./components/OauthRedirect";
+import ChatRoom from "./components/groupChat/ChatRoom";
 
 function App() {
   const [username, setUsername] = useState(() => localStorage.getItem("username"));
@@ -24,6 +25,7 @@ function App() {
         <Route path="/nickname" element={<NicknameSetup setUsername={setUsername} />} />
         <Route path="/lobby" element={<Lobby username={username} />} />
         <Route path="/chat/:roomId" element={<Chat />} />
+        <Route path="/rooms/:roomId" element={<ChatRoom />} />
         <Route path="/dm/list" element={<DMList />} />
         <Route path="/dm/:roomId" element={<PrivateChat />} />
         <Route path="/oauth/success" element={<OAuthRedirect />} />

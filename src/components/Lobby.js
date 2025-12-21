@@ -3,7 +3,7 @@ import { useNavigate } from "react-router-dom";
 import "../Lobby.css";
 import api, { logout } from "../api";
 import { connectWebSocket, getClient } from "../websocket";
-
+import CreateRoomModal from "./groupChat/CreateRoomModal";
 
 const Lobby = () => {
   const [rooms, setRooms] = useState([]);
@@ -19,6 +19,8 @@ const Lobby = () => {
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
   const heartbeatRef = useRef(null);
+
+  const [showCreate, setShowCreate] = useState(false);
 
   useEffect(() => {
     if (!userId || !username) return;
@@ -83,7 +85,23 @@ const Lobby = () => {
         if (payload.type === "REQUEST") loadFriendRequests();
         if (payload.type === "ACCEPT") loadFriends();
       });
+      const enterRoom = (roomId) => {
+        const client = getClient();
+        client.publish({
+          destination: "/app/room.enter",
+          body: JSON.stringify({ roomId, userId })
+        });
+      };
+
+      const leaveRoom = (roomId) => {
+        const client = getClient();
+        client.publish({
+          destination: "/app/room.leave",
+          body: JSON.stringify({ roomId, userId })
+        });
+      };
     });
+      
 
     loadRooms();
     loadDMRooms();
@@ -217,24 +235,16 @@ const loadDMRooms = async () => {
   };
 
   /** 채팅방 입장 */
+  // const handleJoinRoom = (room) => {
+  //   navigate(`/chat/${room.roomId}`, {
+  //     state: { username, roomName: room.name },
+  //   });
+  // };
+
   const handleJoinRoom = (room) => {
-    navigate(`/chat/${room.roomId}`, {
+    navigate(`/rooms/${room.roomId}`, {
       state: { username, roomName: room.name },
     });
-  };
-
-  /** 채팅방 생성 */
-  const handleCreateRoom = async (e) => {
-    e.preventDefault();
-    if (!newRoomName.trim()) return;
-
-    try {
-      const res = await api.post("/rooms", { name: newRoomName });
-      setRooms((prev) => [...prev, res.data]);
-      setNewRoomName("");
-    } catch {
-      setError("채팅방 생성 실패");
-    }
   };
 
   return (
@@ -255,7 +265,15 @@ const loadDMRooms = async () => {
       <div className="lobby-grid">
         {/* 채팅방 목록 */}
         <div className="card rooms">
-          <h3>📁 채팅방 목록</h3>
+            <div className="card-header">
+            <h3>📁 채팅방 목록</h3>
+            <button
+              className="create-room-btn"
+              onClick={() => setShowCreate(true)}
+            >
+              ➕ 생성
+            </button>
+          </div>
           {rooms.length === 0 ? (
             <p className="empty-text">채팅방이 없습니다.</p>
           ) : (
@@ -383,26 +401,28 @@ const loadDMRooms = async () => {
             </ul>
           )}
         </div>
+        {/* 대규모 채팅방 생성 */}
+      <div className="card form-card">
+        <h3>🔥 대규모 채팅방</h3>
 
-
-        {/* 채팅방 생성 */}
-        <div className="card form-card">
-          <h3>➕ 채팅방 생성</h3>
-          <form onSubmit={handleCreateRoom}>
-            <input
-              type="text"
-              placeholder="새 채팅방 이름"
-              value={newRoomName}
-              onChange={(e) => setNewRoomName(e.target.value)}
-            />
-            <button className="create-btn" type="submit">
-              생성
-            </button>
-          </form>
-        </div>
+        <button
+          className="create-btn"
+          onClick={() => setShowCreate(true)}
+        >
+          대규모 채팅방 만들기
+        </button>
       </div>
-
+        {showCreate && (
+        <CreateRoomModal
+          onClose={() => setShowCreate(false)}
+          onCreated={(room) => {
+            setRooms(prev => [...prev, room]);
+          }}
+        />
+      )}
+      </div>
       {error && <p className="error-message">{error}</p>}
+      
     </div>
   );
 };

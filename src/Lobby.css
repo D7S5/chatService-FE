@@ -193,3 +193,27 @@
   font-weight: 600;
   text-align: center;
 }
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.create-room-btn {
+  background: #0b1c79;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.large-room-badge {
+  margin-left: 6px;
+  font-size: 0.7rem;
+  padding: 2px 6px;
+  border-radius: 6px;
+  background: #e6f0ff;
+  color: #2a5bd7;
+}
