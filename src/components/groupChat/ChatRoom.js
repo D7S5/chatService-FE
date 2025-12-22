@@ -19,6 +19,8 @@ const ChatRoom = () => {
 
   const messageEndRef = useRef(null);
 
+  const bottomRef = useRef(null);
+
   /* --------------------------------
      WebSocket 연결 (Chat 방식과 동일)
   -------------------------------- */
@@ -48,7 +50,7 @@ const ChatRoom = () => {
       /** 방 입장 */
       client.publish({
         destination: "/app/room.enter",
-        body: JSON.stringify({ roomId, userId }),
+        body: JSON.stringify({ roomId, userId, username }),
       });
     });
 
@@ -112,44 +114,82 @@ const ChatRoom = () => {
     navigate("/lobby");
   };
 
-  return (
+  const formatTime = (iso) => {
+  const d = new Date(iso);
+  return d.toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
+
+    return (
     <div className="chatroom-wrapper">
       {/* HEADER */}
       <div className="chatroom-header">
-        <h3>💬 대규모 채팅방</h3>
+        <h3>💬 채팅방</h3>
         <span className="count">
           {currentCount} / {maxCount}
-          <div className="header-actions">
-          <button className="header-btn leave-btn" onClick={handleLeave}>
+        </span>
+        <div className="header-actions">
+          <button className="leave-btn" onClick={handleLeave}>
             나가기
           </button>
         </div>
-        </span>
       </div>
 
       {/* MAIN */}
       <div className="chatroom-main">
-        {/* 메시지 */}
+        {/* MESSAGES */}
         <div className="messages">
-          {messages.map((msg, idx) => (
-            <div
-              key={idx}
-              className={`message ${msg.senderId === userId ? "me" : ""}`}
-            >
-              <span className="sender">{msg.senderName}</span>
-              <span className="content">{msg.content}</span>
-            </div>
-          ))}
+          {messages.map((msg, idx) => {
+              const mine = String(msg.senderId) === userId;
+              const prev = messages[idx - 1];
+
+              console.log("서버 senderId:", msg.senderId, typeof msg.senderId);
+              console.log("내 userId:", userId, typeof userId);
+              console.log("mine 판단:", msg.senderId == userId);
+
+              // 상대방일 때만 연속 이름 숨김
+              const showName = !mine && (!prev || prev.senderId !== msg.senderId);
+              const showTime =
+                !prev ||
+                prev.senderId !== msg.senderId ||
+                new Date(msg.createdAt) - new Date(prev.createdAt) > 60 * 1000;
+
+              return (
+                <div
+                  key={idx}
+                  className={`message ${mine ? "me" : "other"}`}
+                >
+                  {showName && <div className="sender">{msg.senderName}</div>}
+
+                  <div className="bubble-row">
+                    {/* 상대방 시간 (왼쪽) */}
+                    {!mine && showTime && (
+                      <span className="time left">{formatTime(msg.createdAt)}</span>
+                    )}
+
+                    <div className="bubble">{msg.content}</div>
+
+                    {/* 내 시간 (오른쪽) */}
+                    {mine && showTime && (
+                      <span className="time right">{formatTime(msg.createdAt)}</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
           <div ref={messageEndRef} />
         </div>
 
-        {/* 참여자 */}
+        {/* PARTICIPANTS */}
+          {/* <h4>👥 참여자</h4> */}
         <div className="participants">
-          <h4>👥 참여자</h4>
           <ul>
             {participants.map((u) => (
               <li key={u.userId}>
-                <span className="dot online" />
+                <span className="dot" />
                 {u.username}
               </li>
             ))}
