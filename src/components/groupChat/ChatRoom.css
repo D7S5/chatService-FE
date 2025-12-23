@@ -133,6 +133,10 @@
   margin-bottom: 2px;
 }
 
+.time.left {
+  order: 2;
+}
+
 /* PARTICIPANTS */
 .participants {
   width: 260px;
