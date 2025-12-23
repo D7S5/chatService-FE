@@ -147,7 +147,7 @@ const ChatRoom = () => {
               const mine = String(msg.senderId) === userId;
               const prev = messages[idx - 1];
 
-              // console.log("서버 senderId:", msg.senderId, typeof msg.senderId);
+              // console.log("서버 senderUsername:", msg.username, typeof msg.username);
               // console.log("내 userId:", userId, typeof userId);
               // console.log("mine 판단:", msg.senderId == userId);
 
