@@ -104,6 +104,7 @@ const ChatRoom = () => {
         senderId: userId,
         senderName: username,
         content: input,
+        sentAt : Date.now() // timestamp
       }),
     });
 
@@ -146,9 +147,9 @@ const ChatRoom = () => {
               const mine = String(msg.senderId) === userId;
               const prev = messages[idx - 1];
 
-              console.log("서버 senderId:", msg.senderId, typeof msg.senderId);
-              console.log("내 userId:", userId, typeof userId);
-              console.log("mine 판단:", msg.senderId == userId);
+              // console.log("서버 senderId:", msg.senderId, typeof msg.senderId);
+              // console.log("내 userId:", userId, typeof userId);
+              // console.log("mine 판단:", msg.senderId == userId);
 
               // 상대방일 때만 연속 이름 숨김
               const showName = !mine && (!prev || prev.senderId !== msg.senderId);
