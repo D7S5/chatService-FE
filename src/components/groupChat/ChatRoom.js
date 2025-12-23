@@ -31,6 +31,12 @@ const ChatRoom = () => {
     }
 
     connectWebSocket((client) => {
+      /** BAN */
+      client.subscribe("/user/queue/rate-limit", (msg) => {
+      const data = JSON.parse(msg.body);
+      alert(`채팅이 너무 빠릅니다.\n${data.retryAfter}초 후 다시 시도하세요.`);
+    });
+    
       /** 채팅 메시지 */
       client.subscribe(`/topic/chat/${roomId}`, (msg) => {
         setMessages((prev) => [...prev, JSON.parse(msg.body)]);
@@ -112,7 +118,19 @@ const ChatRoom = () => {
   };
 
   const handleLeave = () => {
-    navigate("/lobby");
+    const client = getClient();
+
+  if (client && client.connected) {
+    client.publish({
+      destination: "/app/room.leave",
+      body: JSON.stringify({ roomId, userId }),
+    });
+
+    // 소켓 정리
+    client.deactivate();
+  }
+
+  navigate("/lobby");
   };
 
   const formatTime = (iso) => {
@@ -123,7 +141,6 @@ const ChatRoom = () => {
     hour12: false,
   });
 };
-
     return (
     <div className="chatroom-wrapper">
       {/* HEADER */}
