@@ -29,21 +29,9 @@ const Lobby = () => {
 
     // WebSocket 연결
     connectWebSocket((client) => {
-      
-      
-      if (!client || !client.connected) return;
+      // 🔥 STOMP 연결 완료 후 실행됨
 
-      rooms.forEach((room) => {
-        client.subscribe(`/topic/room-count/${room.roomId}`, (msg) => {
-          const data = JSON.parse(msg.body);
-          setRoomCounts((prev) => ({
-            ...prev,
-            [room.roomId]: data.current
-          }));
-        });
-      });
-  
-        /** 1) 입장 이벤트 전송 */
+      /** 1) 입장 이벤트 전송 */
       client.publish({
         destination: "/app/user.enter",
         body: JSON.stringify({ uuid: userId, username }),
@@ -99,8 +87,6 @@ const Lobby = () => {
         if (payload.type === "REQUEST") loadFriendRequests();
         if (payload.type === "ACCEPT") loadFriends();
       });
-
-
       const enterRoom = (roomId) => {
         const client = getClient();
         client.publish({
@@ -118,13 +104,11 @@ const Lobby = () => {
       };
     });
       
-  
-    
+
     loadRooms();
     loadDMRooms();
     loadFriends();
     loadFriendRequests();
-    loadRoomCount();
 
     /** 🔥 브라우저 닫힘 감지 → 자동 logout/offline */
     const handleUnload = () => {
@@ -164,18 +148,6 @@ const Lobby = () => {
     setRooms(res.data);
 };
 
-const loadRoomCount = async () => {
-  const res = await api.get("/rooms/with-count");
-
-  const map = {};
-  res.data.forEach(r => {
-    map[r.roomId] = r.currentCount;
-  });
-
-  // console.log(map);
-
-  setRoomCounts(map);
-};
 const loadDMRooms = async () => {
   const res = await api.get(`/dm/list/${userId}`);
   if (!res) return;
@@ -264,6 +236,13 @@ const loadDMRooms = async () => {
     }
   };
 
+  /** 채팅방 입장 */
+  // const handleJoinRoom = (room) => {
+  //   navigate(`/chat/${room.roomId}`, {
+  //     state: { username, roomName: room.name },
+  //   });
+  // };
+
   const handleJoinRoom = (room) => {
     navigate(`/rooms/${room.roomId}`, {
       state: { username, roomName: room.name },
@@ -284,51 +263,37 @@ const loadDMRooms = async () => {
       로그아웃
     </button>
       </div>
-  <div className="lobby-grid">
-    {/* 채팅방 목록 */}
-    <div className="card rooms">
-      <div className="card-header">
-        <h3>📁 채팅방 목록</h3>
-        <button
-          className="create-room-btn"
-          onClick={() => setShowCreate(true)}
-        >
-          ➕ 생성
-        </button>
-      </div>
 
-      {rooms.length === 0 ? (
-        <p className="empty-text">채팅방이 없습니다.</p>
-      ) : (
-        <ul className="list">
-          {rooms
-            .filter((r) => r.type === "PUBLIC")
-            .map((room) => {
-              const current =
-                roomCounts[room.roomId] ?? room.currentCount ?? 0;
+      <div className="lobby-grid">
+        {/* 채팅방 목록 */}
+        <div className="card rooms">
+            <div className="card-header">
+            <h3>📁 채팅방 목록</h3>
+            <button
+              className="create-room-btn"
+              onClick={() => setShowCreate(true)}
+            >
+              ➕ 생성
+            </button>
+          </div>
+          {rooms.length === 0 ? (
+            <p className="empty-text">채팅방이 없습니다.</p>
+          ) : (
+            <ul className="list">
+              {rooms
+                .filter((r) => r.type === "PUBLIC")
+                .map((room) => (
+                  <li key={room.roomId} className="list-item">
+                    <span>{room.name}</span>
+                    <button className="join-btn" onClick={() => handleJoinRoom(room)}>
+                      입장
+                    </button>
+                  </li>
+                ))}
+            </ul>
+          )}
+        </div>
 
-              return (
-                <li key={room.roomId} className="list-item">
-                  <div className="room-info">
-                    <span className="room-name">{room.name}</span>
-                    <span className="room-count">
-                       {current} / {room.maxParticipants}
-                    </span>
-                  </div>
-
-                  <button
-                    className="join-btn"
-                    disabled={current >= room.maxParticipants}
-                    onClick={() => handleJoinRoom(room)}
-                  >
-                    {current >= room.maxParticipants ? "만석" : "입장"}
-                  </button>
-                </li>
-              );
-            })}
-        </ul>
-      )}
-    </div>
       {/* DM 목록 */}
       <div className="card dm">
           <h3>💌 DM 목록</h3>
@@ -459,6 +424,7 @@ const loadDMRooms = async () => {
       )}
       </div>
       {error && <p className="error-message">{error}</p>}
+      
     </div>
   );
 };

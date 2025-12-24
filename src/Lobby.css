@@ -217,3 +217,22 @@
   background: #e6f0ff;
   color: #2a5bd7;
 }
+
+.room-info {
+  display: flex;
+  flex-direction: column;
+}
+
+.room-name {
+  font-weight: 600;
+}
+
+.room-count {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.join-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
