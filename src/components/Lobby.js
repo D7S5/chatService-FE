@@ -29,19 +29,16 @@ const Lobby = () => {
 
     // WebSocket 연결
     connectWebSocket((client) => {
-      
-      
-      if (!client || !client.connected) return;
 
-      rooms.forEach((room) => {
-        client.subscribe(`/topic/room-count/${room.roomId}`, (msg) => {
-          const data = JSON.parse(msg.body);
-          setRoomCounts((prev) => ({
-            ...prev,
-            [room.roomId]: data.current
-          }));
-        });
-      });
+      // rooms.forEach((room) => {
+      //   client.subscribe(`/topic/room-count/${room.roomId}`, (msg) => {
+      //     const data = JSON.parse(msg.body);
+      //     setRoomCounts((prev) => ({
+      //       ...prev,
+      //       [room.roomId]: data.current
+      //     }));
+      //   });
+      // });
   
         /** 1) 입장 이벤트 전송 */
       client.publish({

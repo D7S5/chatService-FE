@@ -36,7 +36,7 @@ const ChatRoom = () => {
       const data = JSON.parse(msg.body);
       alert(`채팅이 너무 빠릅니다.\n${data.retryAfter}초 후 다시 시도하세요.`);
     });
-    
+
       /** 채팅 메시지 */
       client.subscribe(`/topic/chat/${roomId}`, (msg) => {
         setMessages((prev) => [...prev, JSON.parse(msg.body)]);
@@ -161,14 +161,14 @@ const ChatRoom = () => {
         {/* MESSAGES */}
         <div className="messages">
           {messages.map((msg, idx) => {
-              const mine = String(msg.senderId) === userId;
+              const mine = msg.senderId === userId;
               const prev = messages[idx - 1];
 
-              // console.log("서버 senderUsername:", msg.username, typeof msg.username);
+              // console.log("서버 senderUsername:", msg.senderName, typeof msg.senderName);
               // console.log("내 userId:", userId, typeof userId);
+              // console.log("SenderId", msg.senderId, typeof msg.senderId);
               // console.log("mine 판단:", msg.senderId == userId);
 
-              // 상대방일 때만 연속 이름 숨김
               const showName = !mine && (!prev || prev.senderId !== msg.senderId);
               const showTime =
                 !prev ||
