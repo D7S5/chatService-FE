@@ -29,17 +29,6 @@ const Lobby = () => {
 
     // WebSocket 연결
     connectWebSocket((client) => {
-
-      // rooms.forEach((room) => {
-      //   client.subscribe(`/topic/room-count/${room.roomId}`, (msg) => {
-      //     const data = JSON.parse(msg.body);
-      //     setRoomCounts((prev) => ({
-      //       ...prev,
-      //       [room.roomId]: data.current
-      //     }));
-      //   });
-      // });
-  
         /** 1) 입장 이벤트 전송 */
       client.publish({
         destination: "/app/user.enter",
@@ -96,23 +85,6 @@ const Lobby = () => {
         if (payload.type === "REQUEST") loadFriendRequests();
         if (payload.type === "ACCEPT") loadFriends();
       });
-
-
-      const enterRoom = (roomId) => {
-        const client = getClient();
-        client.publish({
-          destination: "/app/room.enter",
-          body: JSON.stringify({ roomId, userId })
-        });
-      };
-
-      const leaveRoom = (roomId) => {
-        const client = getClient();
-        client.publish({
-          destination: "/app/room.leave",
-          body: JSON.stringify({ roomId, userId })
-        });
-      };
     });
       
   
@@ -162,17 +134,18 @@ const Lobby = () => {
 };
 
 const loadRoomCount = async () => {
-  const res = await api.get("/rooms/with-count");
-
-  const map = {};
-  res.data.forEach(r => {
-    map[r.roomId] = r.currentCount;
-  });
-
-  // console.log(map);
-
-  setRoomCounts(map);
+  try {
+    const res = await api.get("/rooms/with-count");
+    const map = {};
+    res.data.forEach(r => {
+      map[r.roomId] = r.currentCount;
+    });
+    setRoomCounts(map);
+  } catch (e) {
+    console.error("room count load 실패", e);
+  }
 };
+
 const loadDMRooms = async () => {
   const res = await api.get(`/dm/list/${userId}`);
   if (!res) return;
@@ -267,6 +240,26 @@ const loadDMRooms = async () => {
     });
   };
 
+  const handleLogout = () => {
+  const client = getClient();
+
+  if (heartbeatRef.current) {
+    clearInterval(heartbeatRef.current);
+    heartbeatRef.current = null;
+  }
+
+  if (client && client.connected) {
+    client.publish({
+      destination: "/app/user.leave",
+      body: JSON.stringify({ uuid: userId }),
+    });
+    client.deactivate();
+  }
+
+  logout(); // 마지막에 호출
+};
+
+
   return (
     <div className="lobby-wrapper">
       <div className="lobby-header">
@@ -277,7 +270,7 @@ const loadDMRooms = async () => {
         <button onClick={() => navigate("/nickname")} style={{ marginLeft: "10px" }}>
           닉네임 변경
         </button>
-        <button onClick={logout} className="logout-btn">
+        <button onClick={handleLogout} className="logout-btn">
       로그아웃
     </button>
       </div>
