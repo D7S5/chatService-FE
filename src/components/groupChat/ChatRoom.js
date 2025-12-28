@@ -168,6 +168,7 @@ const ChatRoom = () => {
               // console.log("내 userId:", userId, typeof userId);
               // console.log("SenderId", msg.senderId, typeof msg.senderId);
               // console.log("mine 판단:", msg.senderId == userId);
+              // console.log('message  : ', msg.content)
 
               const showName = !mine && (!prev || prev.senderId !== msg.senderId);
               const showTime =

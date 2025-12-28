@@ -259,7 +259,6 @@ const loadDMRooms = async () => {
   logout(); // 마지막에 호출
 };
 
-
   return (
     <div className="lobby-wrapper">
       <div className="lobby-header">
