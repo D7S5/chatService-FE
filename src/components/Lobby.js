@@ -32,7 +32,7 @@ const Lobby = () => {
         /** 1) 입장 이벤트 전송 */
       client.publish({
         destination: "/app/user.enter",
-        body: JSON.stringify({ uuid: userId, username }),
+        body: JSON.stringify({ userId, username }),
       });
 
       /** 2) 첫 heartbeat 딜레이 */
@@ -41,7 +41,7 @@ const Lobby = () => {
 
         client.publish({
           destination: "/app/user.heartbeat",
-          body: JSON.stringify({ uuid: userId }),
+          body: JSON.stringify({ userId : userId }),
         });
 
         // 반복 heartbeat
@@ -50,21 +50,21 @@ const Lobby = () => {
 
           client.publish({
             destination: "/app/user.heartbeat",
-            body: JSON.stringify({ uuid: userId }),
+            body: JSON.stringify({ userId : userId }),
           });
         }, 10000);
       }, 5000);
   
       client.subscribe("/topic/online-users", (msg) => {
         const list = JSON.parse(msg.body);
-        // { uuid : uuid , username : username , online : true }
-        const filteredList = list.filter(u => u.uuid !== userId);
+        // { userId : userId , username : username , online : true }
+        const filteredList = list.filter(u => u.userId !== userId);
 
         setOnlineUsers(filteredList);
 
         const onlineMap = {};
-        list.forEach( u => {
-          onlineMap[u.uuid] = u.online;          
+        filteredList.forEach( u => {
+          onlineMap[u.userId] = u.online;          
         });
 
         setFriends(prev =>
@@ -101,7 +101,7 @@ const Lobby = () => {
       if (client && client.connected) {
         client.publish({
           destination: "/app/user.leave",
-          body: JSON.stringify({ uuid: userId }),
+          body: JSON.stringify({ userId : userId }),
         });
       }
     };
@@ -118,7 +118,7 @@ const Lobby = () => {
       if (client && client.connected) {
         client.publish({
           destination: "/app/user.leave",
-          body: JSON.stringify({ uuid: userId }),
+          body: JSON.stringify({ userId: userId }),
         });
       }
 
@@ -251,13 +251,14 @@ const loadDMRooms = async () => {
   if (client && client.connected) {
     client.publish({
       destination: "/app/user.leave",
-      body: JSON.stringify({ uuid: userId }),
+      body: JSON.stringify({ userId : userId }),
     });
     client.deactivate();
   }
 
   logout(); // 마지막에 호출
 };
+
 
   return (
     <div className="lobby-wrapper">
@@ -352,27 +353,27 @@ const loadDMRooms = async () => {
         {/* 접속 중 사용자 */}
           <div className="card online">
             <h3>🟢 접속 중 사용자</h3>
-            {onlineUsers.filter(u => u.uuid !== userId).length === 0 ? (
+            {onlineUsers.filter(u => u.userId !== userId).length === 0 ? (
               <p className="empty-text">접속 중인 사용자가 없습니다.</p>
             ) : (
               <ul className="list">
                 {onlineUsers
-                  .filter(u => u.uuid !== userId)
+                  .filter(u => u.userId !== userId)
                   .map(u => {
-                    const alreadyFriend = friends.some(f => f.id === u.uuid);
-                    const alreadyRequested = sentFriendRequests.includes(u.uuid);
+                    const alreadyFriend = friends.some(f => f.id === u.userId);
+                    const alreadyRequested = sentFriendRequests.includes(u.userId);
                     return (
-                      <li key={u.uuid} className="list-item">
+                      <li key={u.userId} className="list-item">
                         <span>{u.username}</span>
                         {!alreadyFriend && (
                           <button 
-                            onClick={() => handleSendFriendRequest(u.uuid)}
+                            onClick={() => handleSendFriendRequest(u.userId)}
                             disabled={alreadyRequested}
                           >
                             {alreadyRequested ? "요청 보냄" : "친구 요청"}
                           </button>
                         )}
-                        <button onClick={() => handleSendDM(u.uuid)}>DM</button>
+                        <button onClick={() => handleSendDM(u.userId)}>DM</button>
                       </li>
                     )
                   })}
