@@ -65,7 +65,7 @@ const ChatRoom = () => {
       if (client && client.connected) {
         client.publish({
           destination: "/app/room.leave",
-          body: JSON.stringify({ roomId, userId }),
+          body: JSON.stringify({ roomId, userId, username }),
         });
         client.deactivate();
       }
@@ -123,7 +123,7 @@ const ChatRoom = () => {
   if (client && client.connected) {
     client.publish({
       destination: "/app/room.leave",
-      body: JSON.stringify({ roomId, userId }),
+      body: JSON.stringify({ roomId, userId, username }),
     });
 
     // 소켓 정리
