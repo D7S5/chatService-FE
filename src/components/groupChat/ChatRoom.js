@@ -56,7 +56,7 @@ const ChatRoom = () => {
       /** 방 입장 */
       client.publish({
         destination: "/app/room.enter",
-        body: JSON.stringify({ roomId, userId, username }),
+        body: JSON.stringify({ roomId }),
       });
     });
 
@@ -65,7 +65,7 @@ const ChatRoom = () => {
       if (client && client.connected) {
         client.publish({
           destination: "/app/room.leave",
-          body: JSON.stringify({ roomId, userId, username }),
+          body: JSON.stringify({ roomId }),
         });
         client.deactivate();
       }
@@ -123,7 +123,7 @@ const ChatRoom = () => {
   if (client && client.connected) {
     client.publish({
       destination: "/app/room.leave",
-      body: JSON.stringify({ roomId, userId, username }),
+      body: JSON.stringify({ roomId }),
     });
 
     // 소켓 정리

@@ -256,7 +256,7 @@ const loadDMRooms = async () => {
     client.deactivate();
   }
 
-  logout(); // 마지막에 호출
+  logout();
 };
 
 
