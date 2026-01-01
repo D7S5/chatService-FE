@@ -29,13 +29,13 @@ const Lobby = () => {
 
     // WebSocket 연결
     connectWebSocket((client) => {
-        /** 1) 입장 이벤트 전송 */
+      
       client.publish({
         destination: "/app/user.enter",
         body: JSON.stringify({ userId, username }),
       });
 
-      /** 2) 첫 heartbeat 딜레이 */
+      /** 첫 heartbeat 딜레이 */
       setTimeout(() => {
         if (!client.connected) return;
 
@@ -101,7 +101,7 @@ const Lobby = () => {
       if (client && client.connected) {
         client.publish({
           destination: "/app/user.leave",
-          body: JSON.stringify({ userId : userId }),
+          body: JSON.stringify({}),
         });
       }
     };
@@ -118,7 +118,7 @@ const Lobby = () => {
       if (client && client.connected) {
         client.publish({
           destination: "/app/user.leave",
-          body: JSON.stringify({ userId: userId }),
+          body: JSON.stringify({}),
         });
       }
 
@@ -251,7 +251,7 @@ const loadDMRooms = async () => {
   if (client && client.connected) {
     client.publish({
       destination: "/app/user.leave",
-      body: JSON.stringify({ userId : userId }),
+      body: JSON.stringify({}),
     });
     client.deactivate();
   }
@@ -285,6 +285,14 @@ const loadDMRooms = async () => {
         >
           ➕ 생성
         </button>
+        {showCreate && (
+        <CreateRoomModal
+          onClose={() => setShowCreate(false)}
+          onCreated={(room) => {
+            setRooms(prev => [...prev, room]);
+          }}
+        />
+      )}
       </div>
 
       {rooms.length === 0 ? (
@@ -428,25 +436,6 @@ const loadDMRooms = async () => {
             </ul>
           )}
         </div>
-        {/* 대규모 채팅방 생성 */}
-      <div className="card form-card">
-        <h3>🔥 대규모 채팅방</h3>
-
-        <button
-          className="create-btn"
-          onClick={() => setShowCreate(true)}
-        >
-          대규모 채팅방 만들기
-        </button>
-      </div>
-        {showCreate && (
-        <CreateRoomModal
-          onClose={() => setShowCreate(false)}
-          onCreated={(room) => {
-            setRooms(prev => [...prev, room]);
-          }}
-        />
-      )}
       </div>
       {error && <p className="error-message">{error}</p>}
     </div>
