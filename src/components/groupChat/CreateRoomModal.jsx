@@ -13,19 +13,20 @@ const CreateRoomModal = ({ onClose, onCreated }) => {
   const isLargeRoom = maxUsers >= 100;
 
   const handleCreate = async () => {
+    
     if (!name.trim()) {
       setError("방 이름을 입력하세요.");
       return;
     }
 
     try {
-      const res = await api.post("/rooms", {
+      const res = await api.post("/rooms/create", {
         name,
-        type,
         maxParticipants: maxUsers,
+        type,
       });
 
-      console.log("방 생성 응답:", res.data);
+      // console.log("방 생성 응답:", res.data);
 
       const roomId = res.data.roomId ?? res.data.id;
       
@@ -37,12 +38,14 @@ const CreateRoomModal = ({ onClose, onCreated }) => {
       onCreated?.(res.data);
       onClose();
       navigate(`/rooms/${roomId}`);
+
     } catch (e) {
-      console.error(e);
-      setError("채팅방 생성 실패");
+        setError(
+          e.response?.data?.message ??
+          "채팅방 생성 실패"
+  );
     }
   };
-
 
   return (
     <div className="modal-overlay">
