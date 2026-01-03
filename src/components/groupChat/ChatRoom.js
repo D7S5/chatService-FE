@@ -31,6 +31,8 @@ const ChatRoom = () => {
     const enterRoom = async () => {
       try {
         await api.post(`/rooms/${roomId}/participants`);
+        
+        await reloadParticipants();
       } catch (e) {
         console.error("방 참가 실패", e);
         navigate("/lobby");
@@ -200,11 +202,12 @@ const ChatRoom = () => {
         {/* PARTICIPANTS */}
         <div className="participants">
           <ul>
-            {participants.map((u) => (
-              <li key={u.userId}>
-                <span className="dot" />
-                {u.username}
-              </li>
+            {participants.map((p) => (
+            <li key={p.userId}>
+              <span>{p.username}</span>
+              {p.role === "OWNER" && <strong> 👑</strong>}
+              {p.role === "ADMIN" && <strong> 🛡</strong>}
+            </li>
             ))}
           </ul>
         </div>
