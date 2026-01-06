@@ -17,6 +17,7 @@ const ChatRoom = () => {
   const [currentCount, setCurrentCount] = useState(0);
   const [maxCount, setMaxCount] = useState(0);
   const [input, setInput] = useState("");
+  const [forcedExit, setForcedExit] = useState(null);
 
   const messageEndRef = useRef(null);
 
@@ -47,6 +48,20 @@ const ChatRoom = () => {
     enterRoom();
   }, [roomId, userId, username, navigate]);
 
+  useEffect(() => {
+
+  if (!forcedExit) return;
+
+  if (forcedExit.reason === "KICK") {
+    alert("관리자에 의해 강퇴되었습니다.");
+  } else {
+    alert("이 방에서 차단되었습니다. 사유 = " + forcedExit.reason);
+  }
+
+  getClient()?.deactivate();
+  navigate("/lobby");
+}, [forcedExit, navigate]);
+
   /* ==================================================
       WebSocket 연결 (메시지 전용)
   ================================================== */
@@ -75,18 +90,21 @@ const ChatRoom = () => {
 
       client.subscribe("/user/queue/room-force-exit", (msg) => {
         
-        const { roomId : forcedRoomId, reason } = JSON.parse(msg.body);
+        const data = JSON.parse(msg.body);
 
-        if (forcedRoomId !== roomId) return;
+        if (data.roomId !== roomId) return;
 
-        if (reason === "KICK") {
-          alert("관리자에 의해 강퇴되었습니다.");
-        } else {
-          alert("관리자에 의한 밴, 사유 = " + reason )
-        }
+        setForcedExit(data);
+        reloadParticipants();
 
-        getClient()?.deactivate();
-        navigate("/lobby");
+        // if (reason === "KICK") {
+        //   alert("관리자에 의해 강퇴되었습니다.");
+        // } else {
+        //   alert("관리자에 의한 밴, 사유 = " + reason )
+        // }
+
+        // getClient()?.deactivate();
+        // navigate("/lobby");
       });
     });
 
