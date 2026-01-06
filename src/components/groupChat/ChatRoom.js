@@ -23,7 +23,7 @@ const ChatRoom = () => {
   const me = participants.find((p) => p.userId === userId);
 
   /* ==================================================
-     1️⃣ 방 참가 (REST – 단 1회)
+     방 참가
   ================================================== */
   useEffect(() => {
     if (!userId || !username) {
@@ -48,7 +48,7 @@ const ChatRoom = () => {
   }, [roomId, userId, username, navigate]);
 
   /* ==================================================
-     2️⃣ WebSocket 연결 (메시지 전용)
+      WebSocket 연결 (메시지 전용)
   ================================================== */
   useEffect(() => {
     connectWebSocket((client) => {
@@ -69,29 +69,23 @@ const ChatRoom = () => {
       });
 
       /** 인원 수 */
-      client.subscribe(`/topic/rooms/${roomId}`, (msg) => {
+      client.subscribe(`/topic/rooms/${roomId}/count`, (msg) => {
         setCurrentCount(JSON.parse(msg.body).current);
       });
 
-      
-      client.subscribe(`/topic/room-events/${roomId}`, (msg) => {
-        const event = JSON.parse(msg.body);
-
-        if (event.type === "LEAVE") {
-          handleLeaveEvent(event);
-        }
-
-        if (event.type === "KICK" || event.type === "BAN") {
-          reloadParticipants();
-        }
-
-      });
-
       client.subscribe("/user/queue/room-force-exit", (msg) => {
-        const data = JSON.parse(msg.body);
         
-        alert(`강제 퇴장되었습니다. (${data.reason})`);
-        
+        const { roomId : forcedRoomId, reason } = JSON.parse(msg.body);
+
+        if (forcedRoomId !== roomId) return;
+
+        if (reason === "KICK") {
+          alert("관리자에 의해 강퇴되었습니다.");
+        } else {
+          alert("관리자에 의한 밴, 사유 = " + reason )
+        }
+
+        getClient()?.deactivate();
         navigate("/lobby");
       });
     });
@@ -102,7 +96,7 @@ const ChatRoom = () => {
   }, [roomId]);
 
   /* ==================================================
-     3️⃣ 초기 REST 데이터 로드
+     초기 REST 데이터 로드
   ================================================== */
   const reloadParticipants = async () => {
     const res = await api.get(`/rooms/${roomId}/participants`);
@@ -121,15 +115,12 @@ const ChatRoom = () => {
     });
   }, [roomId]);
 
-  /* ==================================================
-     4️⃣ 메시지 자동 스크롤
-  ================================================== */
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
   /* ==================================================
-     5️⃣ 메시지 전송
+     메시지 전송
   ================================================== */
   const sendMessage = () => {
     if (!input.trim()) return;
@@ -206,27 +197,6 @@ const handleBan = async (p) => {
 
   await banUser(p.userId, reason);
   reloadParticipants();
-};
-
-const handleLeaveEvent = (event) => {
-  const { user, reason } = event;
-
-  setParticipants((prev) =>
-    prev.filter((p) => p.userId !== user.userId)
-  );
-  
-  if (user.userId !== userId) return;
-  
-  if (reason === "KICK") {
-    alert("관리자에 의해 강퇴되었습니다.");
-  } else if (reason === "BAN") {
-    alert("이 방에서 차단되었습니다.");
-  } else {
-    return; // 일반 LEAVE
-  }
-    
-  getClient()?.deactivate();
-    navigate("/lobby");
 };
 
   /* ==================================================
