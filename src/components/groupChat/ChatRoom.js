@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api";
 import { connectWebSocket, getClient } from "../../websocket";
 import "./ChatRoom.css";
+import ParticipantItem from "./ParticipantItem";
 
 const ChatRoom = () => {
   const { roomId } = useParams();
@@ -19,6 +20,8 @@ const ChatRoom = () => {
 
   const messageEndRef = useRef(null);
 
+  const me = participants.find((p) => p.userId === userId);
+
   /* ==================================================
      1️⃣ 방 참가 (REST – 단 1회)
   ================================================== */
@@ -31,9 +34,11 @@ const ChatRoom = () => {
     const enterRoom = async () => {
       try {
         await api.post(`/rooms/${roomId}/participants`);
-        
         await reloadParticipants();
-      } catch (e) {
+    } catch (e) {
+        if (e.response?.status === 403) {
+            alert("이 채팅방에서 차단되었습니다.");
+      }
         console.error("방 참가 실패", e);
         navigate("/lobby");
       }
@@ -64,8 +69,30 @@ const ChatRoom = () => {
       });
 
       /** 인원 수 */
-      client.subscribe(`/topic/room-count/${roomId}`, (msg) => {
+      client.subscribe(`/topic/rooms/${roomId}`, (msg) => {
         setCurrentCount(JSON.parse(msg.body).current);
+      });
+
+      
+      client.subscribe(`/topic/room-events/${roomId}`, (msg) => {
+        const event = JSON.parse(msg.body);
+
+        if (event.type === "LEAVE") {
+          handleLeaveEvent(event);
+        }
+
+        if (event.type === "KICK" || event.type === "BAN") {
+          reloadParticipants();
+        }
+
+      });
+
+      client.subscribe("/user/queue/room-force-exit", (msg) => {
+        const data = JSON.parse(msg.body);
+        
+        alert(`강제 퇴장되었습니다. (${data.reason})`);
+        
+        navigate("/lobby");
       });
     });
 
@@ -124,9 +151,6 @@ const ChatRoom = () => {
     setInput("");
   };
 
-  /* ==================================================
-     6️⃣ 방 나가기 (REST 단일 책임)
-  ================================================== */
   const handleLeave = async () => {
     try {
       await api.delete(`/rooms/${roomId}/participants`);
@@ -147,6 +171,64 @@ const ChatRoom = () => {
     });
   };
 
+  const kickUser = async (targetUserId) => {
+  try {
+    await api.post(`/rooms/${roomId}/kick`, {
+      targetUserId,
+    });
+  } catch (e) {
+    alert("강퇴 실패");
+  }
+};
+
+const banUser = async (targetUserId, reason) => {
+  try {
+    await api.post(`/rooms/${roomId}/ban`, {
+      targetUserId,
+      reason,
+    });
+  } catch (e) {
+    alert("밴 실패");
+  }
+};
+
+const handleKick = async (p) => {
+  if (!window.confirm(`${p.username} 님을 강퇴할까요?`)) return;
+
+  await kickUser(p.userId);
+};
+
+const handleBan = async (p) => {
+  const reason = prompt(
+    `${p.username} 님을 차단합니다.\n사유를 입력하세요`
+  );
+  if (!reason) return;
+
+  await banUser(p.userId, reason);
+  reloadParticipants();
+};
+
+const handleLeaveEvent = (event) => {
+  const { user, reason } = event;
+
+  setParticipants((prev) =>
+    prev.filter((p) => p.userId !== user.userId)
+  );
+  
+  if (user.userId !== userId) return;
+  
+  if (reason === "KICK") {
+    alert("관리자에 의해 강퇴되었습니다.");
+  } else if (reason === "BAN") {
+    alert("이 방에서 차단되었습니다.");
+  } else {
+    return; // 일반 LEAVE
+  }
+    
+  getClient()?.deactivate();
+    navigate("/lobby");
+};
+
   /* ==================================================
      RENDER
   ================================================== */
@@ -163,7 +245,7 @@ const ChatRoom = () => {
         </button>
       </div>
 
-      {/* MAIN */}
+      {/* MAIN */}  
       <div className="chatroom-main">
         {/* MESSAGES */}
         <div className="messages">
@@ -203,11 +285,13 @@ const ChatRoom = () => {
         <div className="participants">
           <ul>
             {participants.map((p) => (
-            <li key={p.userId}>
-              <span>{p.username}</span>
-              {p.role === "OWNER" && <strong> 👑</strong>}
-              {p.role === "ADMIN" && <strong> 🛡</strong>}
-            </li>
+              <ParticipantItem
+                key={p.userId}
+                p={p}
+                me={me}
+                onKick={handleKick}
+                onBan={handleBan}
+              />
             ))}
           </ul>
         </div>

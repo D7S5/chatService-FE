@@ -1,0 +1,70 @@
+.participant-item {
+  position: relative;
+  padding: 6px 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.participant-item:hover {
+  background: #f5f5f5;
+}
+
+.participant-item.me {
+  cursor: default;
+}
+
+.user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.name {
+  font-size: 14px;
+}
+
+.role.owner {
+  color: gold;
+}
+
+.role.admin {
+  color: #4aa3ff;
+}
+
+/* ===== MENU ===== */
+
+.menu {
+  position: absolute;
+  right: 6px;
+  top: 28px;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+  z-index: 10;
+  min-width: 80px;
+}
+
+.menu-item {
+  width: 100%;
+  padding: 6px;
+  font-size: 13px;
+  border: none;
+  background: none;
+  cursor: pointer;
+}
+
+.menu-item:hover {
+  background: #f0f0f0;
+}
+
+.menu-item.kick {
+  color: #333;
+}
+
+.menu-item.ban {
+  color: red;
+  font-weight: bold;
+}
