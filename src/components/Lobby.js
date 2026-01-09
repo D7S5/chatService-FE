@@ -41,7 +41,7 @@ const Lobby = () => {
 
         client.publish({
           destination: "/app/user.heartbeat",
-          body: JSON.stringify({ userId : userId }),
+          body: JSON.stringify({}),
         });
 
         // 반복 heartbeat
@@ -50,7 +50,7 @@ const Lobby = () => {
 
           client.publish({
             destination: "/app/user.heartbeat",
-            body: JSON.stringify({ userId : userId }),
+            body: JSON.stringify({}),
           });
         }, 10000);
       }, 5000);

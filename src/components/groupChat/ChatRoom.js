@@ -94,7 +94,6 @@ const ChatRoom = () => {
         setForcedExit(data);
       });
 
-
       reloadParticipants();
       reloadCount();    
     });
@@ -103,6 +102,7 @@ const ChatRoom = () => {
       getClient()?.deactivate();
     };
   }, [roomId]);
+  
 
   /* ==================================================
      초기 REST 데이터 로드
@@ -119,7 +119,6 @@ const ChatRoom = () => {
   }
 
   useEffect(() => {
-    
     api.get(`/rooms/${roomId}`).then((res) => {
       setMaxCount(res.data.maxParticipants);
     });
