@@ -94,6 +94,16 @@ const ChatRoom = () => {
         setForcedExit(data);
       });
 
+      client.subscribe(`/topic/rooms/${roomId}/participants`, (msg) => {
+          const { userId, role } = JSON.parse(msg.body);
+
+          setParticipants((prev) =>
+            prev.map((p) =>
+              p.userId === userId ? { ...p, role } : p
+            )
+          );
+        });
+
       reloadParticipants();
       reloadCount();    
     });
@@ -117,8 +127,8 @@ const ChatRoom = () => {
       setCurrentCount(res.data.current)
     });
   }
-
   useEffect(() => {
+
     api.get(`/rooms/${roomId}`).then((res) => {
       setMaxCount(res.data.maxParticipants);
     });
@@ -216,6 +226,18 @@ const handleBan = async (p) => {
   reloadParticipants();
 };
 
+const handleGrantAdmin = (user) => {
+  const client = getClient();
+  if (!client?.connected) return;
+
+  client.publish({
+    destination: `/app/rooms/${roomId}/admin`,
+    body: JSON.stringify({
+      targetUserId: user.userId,
+    }),
+  });
+};
+
   /* ==================================================
      RENDER
   ================================================== */
@@ -278,6 +300,7 @@ const handleBan = async (p) => {
                 me={me}
                 onKick={handleKick}
                 onBan={handleBan}
+                onGrantAdmin={handleGrantAdmin}
               />
             ))}
           </ul>

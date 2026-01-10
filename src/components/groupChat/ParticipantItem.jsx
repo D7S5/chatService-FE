@@ -1,19 +1,28 @@
 import React, { useState, useRef, useEffect } from "react";
 import "./ParticipantItem.css";
 
-const ParticipantItem = ({ p, me, onKick, onBan }) => {
+const ParticipantItem = ({
+  p,
+  me,
+  onKick,
+  onBan,
+  onGrantAdmin, 
+}) => {
   const [open, setOpen] = useState(false);
   const itemRef = useRef(null);
 
-  /** 🔒 me 없으면 렌더링만 막고 Hook은 정상 실행 */
   const isMeMissing = !me;
 
   const isMe = me && p.userId === me.userId;
   const isOwner = me?.role === "OWNER";
   const isAdmin = me?.role === "ADMIN";
 
+  const isTargetAdmin = p.role === "ADMIN";
+  const isTargetOwner = p.role === "OWNER";
+
   const canKick = !isMe && (isOwner || isAdmin);
   const canBan = !isMe && isOwner;
+  const canGrantAdmin = !isMe && isOwner && p.role !== "OWNER"; // ⭐ 핵심
 
   /** 바깥 클릭 시 닫기 */
   useEffect(() => {
@@ -34,7 +43,9 @@ const ParticipantItem = ({ p, me, onKick, onBan }) => {
       ref={itemRef}
       className={`participant-item ${isMe ? "me" : ""}`}
       onClick={() => {
-        if (canKick || canBan) setOpen((v) => !v);
+        if (canKick || canBan || canGrantAdmin) {
+          setOpen((v) => !v);
+        }
       }}
     >
       {/* USER INFO */}
@@ -45,8 +56,21 @@ const ParticipantItem = ({ p, me, onKick, onBan }) => {
       </div>
 
       {/* ACTION MENU */}
-      {open && (canKick || canBan) && (
+      {open && ((canKick || canBan || canGrantAdmin) && !isTargetOwner) && (
         <div className="menu">
+          {canGrantAdmin && (
+            <button
+              className="menu-item admin"
+              onClick={(e) => {
+                e.stopPropagation();
+                setOpen(false);
+                onGrantAdmin(p);
+              }}
+            >
+              {isTargetAdmin ? "관리자 해제" : "관리자 지정"}
+            </button>
+          )}
+
           {canKick && (
             <button
               className="menu-item kick"
