@@ -236,3 +236,30 @@
   background: #ccc;
   cursor: not-allowed;
 }
+
+.invite-box {
+  display: flex;
+  gap: 8px;
+  margin: 12px 0 20px;
+}
+
+.invite-box input {
+  flex: 1;
+  padding: 8px;
+  border-radius: 6px;
+  border: 1px solid #ccc;
+}
+
+.invite-box button {
+  padding: 8px 14px;
+  border-radius: 6px;
+  border: none;
+  background-color: #4caf50;
+  color: white;
+  cursor: pointer;
+}
+
+.invite-box button:disabled {
+  background-color: #aaa;
+  cursor: not-allowed;
+}

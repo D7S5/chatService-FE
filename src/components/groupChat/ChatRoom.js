@@ -4,6 +4,7 @@ import api from "../../api";
 import { connectWebSocket, getClient } from "../../websocket";
 import "./ChatRoom.css";
 import ParticipantItem from "./ParticipantItem";
+import InviteCodePanel from "./InviteCodePanel";
 
 const ChatRoom = () => {
   const { roomId } = useParams();
@@ -20,8 +21,14 @@ const ChatRoom = () => {
   const [forcedExit, setForcedExit] = useState(null);
 
   const messageEndRef = useRef(null);
-
+  const [roomType, setRoomType] = useState()
   const me = participants.find((p) => p.userId === userId);
+  const isAdmin = me?.role === "ADMIN";
+  const isOwner = me?.role === "OWNER";
+
+  const isPrivate = roomType === "PRIVATE";
+
+  const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
     if (!userId || !username) {
@@ -95,14 +102,14 @@ const ChatRoom = () => {
       });
 
       client.subscribe(`/topic/rooms/${roomId}/participants`, (msg) => {
-          const { userId, role } = JSON.parse(msg.body);
+        const { userId, role } = JSON.parse(msg.body);
 
-          setParticipants((prev) =>
-            prev.map((p) =>
-              p.userId === userId ? { ...p, role } : p
-            )
-          );
-        });
+        setParticipants((prev) =>
+          prev.map((p) =>
+            p.userId === userId ? { ...p, role } : p
+          )
+        );
+      });
 
       reloadParticipants();
       reloadCount();    
@@ -131,6 +138,7 @@ const ChatRoom = () => {
 
     api.get(`/rooms/${roomId}`).then((res) => {
       setMaxCount(res.data.maxParticipants);
+      setRoomType(res.data.type); 
     });
 
     reloadParticipants();
@@ -253,9 +261,20 @@ const handleGrantAdmin = (user) => {
           나가기
         </button>
       </div>
-
       {/* MAIN */}  
       <div className="chatroom-main">
+        <div className={`left-sidebar ${sidebarOpen ? "open" : "closed"}`}>
+            <button
+              className="sidebar-toggle"
+              onClick={() => setSidebarOpen((v) => !v)}
+            >
+              {sidebarOpen ? "◀" : "▶"}
+            </button>
+
+            {sidebarOpen && isPrivate && (
+              <InviteCodePanel roomId={roomId} isAdmin={isAdmin || isOwner} />
+            )}
+          </div>
         {/* MESSAGES */}
         <div className="messages">
           {messages.map((msg, idx) => {
@@ -289,7 +308,6 @@ const handleGrantAdmin = (user) => {
           })}
           <div ref={messageEndRef} />
         </div>
-
         {/* PARTICIPANTS */}
         <div className="participants">
           <ul>

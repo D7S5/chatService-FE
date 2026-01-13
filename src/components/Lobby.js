@@ -24,6 +24,10 @@ const Lobby = () => {
 
   const [showCreate, setShowCreate] = useState(false);
 
+  const [inviteCode, setInviteCode] = useState("");
+  const [joining, setJoining] = useState(false);
+
+
   useEffect(() => {
     if (!userId || !username) return;
 
@@ -87,15 +91,13 @@ const Lobby = () => {
       });
     });
       
-  
-    
     loadRooms();
     loadDMRooms();
     loadFriends();
     loadFriendRequests();
     loadRoomCount();
 
-    /** 🔥 브라우저 닫힘 감지 → 자동 logout/offline */
+    /** 브라우저 닫힘 감지 → 자동 logout/offline */
     const handleUnload = () => {
       const client = getClient();
       if (client && client.connected) {
@@ -108,7 +110,7 @@ const Lobby = () => {
 
     window.addEventListener("beforeunload", handleUnload);
 
-    /** 🔥 언마운트 시 정리 */
+    /** 언마운트 시 정리 */
     return () => {
       window.removeEventListener("beforeunload", handleUnload);
 
@@ -259,10 +261,60 @@ const loadDMRooms = async () => {
   logout();
 };
 
+// const joinByInvite = async () => {
+//   try {
+//     await api.post("/api/rooms/join-by-invite", {
+//       inviteCode: inputCode
+//     });
+
+//     navigate(`/rooms/${roomId}`);
+//   } catch (e) {
+//     alert(e.response?.data?.message ?? "입장 실패");
+//   }
+// };
+
+const handleJoinByInvite = async () => {
+  if (!inviteCode.trim()) {
+    alert("초대코드를 입력하세요.");
+    return;
+  }
+
+  try {
+    setJoining(true);
+
+    const res = await api.post("/rooms/join-by-invite", {
+      inviteCode,
+    });
+
+    const roomId = res.data.roomId;
+
+    navigate(`/rooms/${roomId}`);
+  } catch (e) {
+    alert(e.response?.data?.message ?? "초대코드가 유효하지 않습니다.");
+  } finally {
+    setJoining(false);
+    setInviteCode("");
+  }
+};
+
 
   return (
     <div className="lobby-wrapper">
       <div className="lobby-header">
+        <div className="invite-box">
+          <input
+            type="text"
+            placeholder="초대코드 입력"
+            value={inviteCode}
+            onChange={(e) => setInviteCode(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && handleJoinByInvite()}
+            disabled={joining}
+          />
+          <button onClick={handleJoinByInvite} disabled={joining}>
+            입장
+          </button>
+        </div>
+
         <h2>💬 채팅 로비</h2>
         <p className="welcome">
           환영합니다, <strong>{username}</strong>님!
