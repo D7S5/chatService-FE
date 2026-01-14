@@ -261,19 +261,8 @@ const loadDMRooms = async () => {
   logout();
 };
 
-// const joinByInvite = async () => {
-//   try {
-//     await api.post("/api/rooms/join-by-invite", {
-//       inviteCode: inputCode
-//     });
-
-//     navigate(`/rooms/${roomId}`);
-//   } catch (e) {
-//     alert(e.response?.data?.message ?? "입장 실패");
-//   }
-// };
-
 const handleJoinByInvite = async () => {
+  
   if (!inviteCode.trim()) {
     alert("초대코드를 입력하세요.");
     return;

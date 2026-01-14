@@ -28,6 +28,8 @@ const ChatRoom = () => {
 
   const isPrivate = roomType === "PRIVATE";
 
+  const canToggleSidebar = isPrivate && (isAdmin || isOwner)
+
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
@@ -36,21 +38,60 @@ const ChatRoom = () => {
       return;
     }
 
-    const enterRoom = async () => {
+    const init = async () => {
       try {
+        const roomRes = await api.get(`/rooms/${roomId}`);
+
+        if (roomRes.data.accessible == false) {
+          // console.log("accessible = " + roomRes.data.accessible)
+          // console.log("reason = " + roomRes.data.reason)
+          navigate("/lobby")
+        } else {
+          setMaxCount(roomRes.data.maxParticipants);
+          setRoomType(roomRes.data.type);
+
+          await enterRoom(roomRes.data.type, roomRes.data.ownerUserId);
+        }
+      } catch (e) {
+        handleEnterRoomError(e);
+      }
+    }
+    
+    init();
+  }, [roomId, userId, username, navigate]);
+  
+  const enterRoom = async (type, ownerUserId) => {
+      try {
+        if (type === "PRIVATE" && ownerUserId === userId) {
+          return ;
+        }
         await api.post(`/rooms/${roomId}/participants`);
         await reloadParticipants();
-    } catch (e) {
-        if (e.response?.status === 403) {
-            alert("이 채팅방에서 차단되었습니다.");
-      }
-        console.error("방 참가 실패", e);
-        navigate("/lobby");
+    } catch (e) { 
+        handleEnterRoomError(e)
       }
     };
 
-    enterRoom();
-  }, [roomId, userId, username, navigate]);
+  const handleEnterRoomError = (e) => {
+      if (!e || !e.response) {
+        console.error("알 수 없는 에러", e);
+        alert("방에 입장할 수 없습니다.");
+        navigate("/lobby");
+        return;
+      }
+
+      const msg = e.response.data?.message;
+
+      if (msg === "INVITE_CODE_REQUIRED") {
+        alert("비밀방은 초대코드로만 입장할 수 있습니다.");
+      } else if (msg === "BANNED") {
+        alert("이 채팅방에서 차단되었습니다.");
+      } else {
+        alert("방에 입장할 수 없습니다.");
+      }
+
+      navigate("/lobby");
+    };
 
   useEffect(() => {
 
@@ -263,18 +304,29 @@ const handleGrantAdmin = (user) => {
       </div>
       {/* MAIN */}  
       <div className="chatroom-main">
-        <div className={`left-sidebar ${sidebarOpen ? "open" : "closed"}`}>
-            <button
-              className="sidebar-toggle"
-              onClick={() => setSidebarOpen((v) => !v)}
-            >
-              {sidebarOpen ? "◀" : "▶"}
-            </button>
+          {/* ✅ LEFT SIDEBAR (ADMIN / OWNER만 렌더링) */}
+          {canToggleSidebar && (
+            <div className={`left-sidebar ${sidebarOpen ? "open" : "closed"}`}>
 
-            {sidebarOpen && isPrivate && (
-              <InviteCodePanel roomId={roomId} isAdmin={isAdmin || isOwner} />
-            )}
-          </div>
+              {/* 토글 버튼 */}
+              <button
+                className="sidebar-toggle"
+                onClick={() => setSidebarOpen((v) => !v)}
+                title={sidebarOpen ? "사이드바 접기" : "사이드바 펼치기"}
+              >
+                {sidebarOpen ? "◀" : "▶"}
+              </button>
+
+              {/* PRIVATE 방 + 펼쳐진 상태일 때만 초대코드 UI */}
+              {sidebarOpen && isPrivate && (
+                <InviteCodePanel
+                  roomId={roomId}
+                  isAdmin={true}
+                />
+              )}
+            </div>
+          )}
+
         {/* MESSAGES */}
         <div className="messages">
           {messages.map((msg, idx) => {
