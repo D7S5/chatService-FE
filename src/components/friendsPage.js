@@ -29,9 +29,6 @@ const FriendsPage = () => {
     setPendingSent(res2.data);
   };
 
-  /** ------------------------------
-   * 친구 요청 보내기
-   --------------------------------*/
   const sendRequest = async () => {
     if (!searchId) return alert("UUID를 입력하세요.");
     try {
@@ -44,9 +41,6 @@ const FriendsPage = () => {
     }
   };
 
-  /** ------------------------------
-   * 요청 수락
-   --------------------------------*/
   const acceptRequest = async (id) => {
     await api.post(`/friends/accept/${id}`);
     alert("수락했습니다.");
@@ -54,18 +48,12 @@ const FriendsPage = () => {
     loadRequests();
   };
 
-  /** ------------------------------
-   * 요청 거절
-   --------------------------------*/
   const rejectRequest = async (id) => {
     await api.post(`/friends/reject/${id}`);
     alert("거절했습니다.");
     loadRequests();
   };
-
-  /** ------------------------------
-   * 보낸 요청 취소
-   --------------------------------*/
+  /* 보낸 요청 취소 */
   const cancelRequest = async (to) => {
     await api.post(`/friends/cancel?from=${userId}&to=${to}`);
     alert("요청을 취소했습니다.");
@@ -76,7 +64,7 @@ const FriendsPage = () => {
     <div className="friends-container">
       <h1>친구 관리</h1>
 
-      {/* 🔍 친구 검색 영역 */}
+      {/* 친구 검색 영역 */}
       <div className="card">
         <h2>친구 추가</h2>
         <input
@@ -88,7 +76,7 @@ const FriendsPage = () => {
         <button className="primary" onClick={sendRequest}>친구 요청</button>
       </div>
 
-      {/* 📩 받은 친구 요청 */}
+      {/* 받은 친구 요청 */}
       <div className="card">
         <h2>받은 요청</h2>
         {pendingReceived.length === 0 ? (
@@ -104,7 +92,7 @@ const FriendsPage = () => {
         )}
       </div>
 
-      {/* 📤 보낸 요청 */}
+      {/* 보낸 요청 */}
       <div className="card">
         <h2>보낸 요청</h2>
         {pendingSent.length === 0 ? (
@@ -119,7 +107,7 @@ const FriendsPage = () => {
         )}
       </div>
 
-      {/* 👥 친구 목록 */}
+      {/* 친구 목록 */}
       <div className="card">
         <h2>친구 목록</h2>
         {friendList.length === 0 ? (

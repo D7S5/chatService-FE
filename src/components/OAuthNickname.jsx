@@ -8,7 +8,6 @@ const OAuthNickname = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
   const [params] = useSearchParams();
-//   const [available, setAvailable] = useState(null);
 
   const token = params.get("token");
 

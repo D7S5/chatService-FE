@@ -110,7 +110,6 @@ const Lobby = () => {
 
     window.addEventListener("beforeunload", handleUnload);
 
-    /** 언마운트 시 정리 */
     return () => {
       window.removeEventListener("beforeunload", handleUnload);
 
@@ -174,7 +173,7 @@ const loadDMRooms = async () => {
 
   setFriendRequests(res.data);
 };
-  /** DM 시작 */
+  /* DM 시작 */
   const handleSendDM = async (targetUuid) => {
       const res = await api.post("/dm/start", {
         userA: userId,
@@ -188,7 +187,7 @@ const loadDMRooms = async () => {
       });
   };
 
-  /** 친구 요청 */
+  /* 친구 요청 */
   const handleSendFriendRequest = async (targetUuid) => {
     try {
       await api.post("/user/friends/request", {

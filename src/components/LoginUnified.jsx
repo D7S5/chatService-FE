@@ -12,9 +12,6 @@ const LoginUnified = () => {
   const [error, setError] = useState("");
   const navigate = useNavigate();
 
-  /* -------------------------------
-     일반 이메일 로그인
-  -------------------------------- */
   const handleEmailLogin = async (e) => {
     e.preventDefault();
     setError("");
@@ -38,9 +35,6 @@ const LoginUnified = () => {
     }
   };
 
-  /* -------------------------------
-     OAuth 로그인 (리다이렉트)
-  -------------------------------- */
   const handleOAuthLogin = (provider) => {
     const baseUrl = process.env.REACT_APP_API_BASE || "http://localhost:9090";
     window.location.href = `${baseUrl}/oauth2/authorization/${provider}`;
