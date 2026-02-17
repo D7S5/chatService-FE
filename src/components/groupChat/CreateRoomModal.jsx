@@ -26,8 +26,6 @@ const CreateRoomModal = ({ onClose, onCreated }) => {
         type,
       });
 
-      // console.log("방 생성 응답:", res.data);
-
       const roomId = res.data.roomId ?? res.data.id;
       
       if (!roomId) {
@@ -35,17 +33,15 @@ const CreateRoomModal = ({ onClose, onCreated }) => {
         return;
       }
 
-      onCreated?.(res.data);
-      onClose();
-      navigate(`/rooms/${roomId}`);
+        onCreated?.(res.data);
+        onClose();
+        navigate(`/rooms/${roomId}`);
 
     } catch (e) {
         setError(
           e.response?.data?.message ??
           "채팅방 생성 실패"
-  );
-    }
-  };
+  )}};
 
   return (
     <div className="modal-overlay">

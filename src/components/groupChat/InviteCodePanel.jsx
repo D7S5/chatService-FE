@@ -25,6 +25,7 @@ const InviteCodePanel = ({ roomId, isAdmin }) => {
 
   const copyToClipboard = async () => {
     await navigator.clipboard.writeText(inviteCode);
+    
     alert("초대코드가 복사되었습니다.");
   };
 

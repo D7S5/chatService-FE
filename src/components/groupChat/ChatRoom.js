@@ -27,9 +27,7 @@ const ChatRoom = () => {
   const isOwner = me?.role === "OWNER";
 
   const isPrivate = roomType === "PRIVATE";
-
   const canToggleSidebar = isPrivate && (isAdmin || isOwner)
-
   const [sidebarOpen, setSidebarOpen] = useState(true);
 
   useEffect(() => {
@@ -94,22 +92,18 @@ const ChatRoom = () => {
     };
 
   useEffect(() => {
+    if (!forcedExit) return;
 
-  if (!forcedExit) return;
+    if (forcedExit.reason === "KICK") {
+      alert("관리자에 의해 강퇴되었습니다.");
+    } else {
+      alert("이 방에서 차단되었습니다. 사유 = " + forcedExit.reason);
+    }
+      getClient()?.deactivate();
 
-  if (forcedExit.reason === "KICK") {
-    alert("관리자에 의해 강퇴되었습니다.");
-  } else {
-    alert("이 방에서 차단되었습니다. 사유 = " + forcedExit.reason);
-  }
-
-  getClient()?.deactivate();
-  navigate("/lobby");
+      navigate("/lobby");
 }, [forcedExit, navigate]);
 
-  /* ==================================================
-      WebSocket 연결 (메시지 전용)
-  ================================================== */
   useEffect(() => {
     connectWebSocket((client) => {
       /** 채팅 제한 */
@@ -136,10 +130,9 @@ const ChatRoom = () => {
       client.subscribe("/user/queue/room-force-exit", (msg) => {
         
         const data = JSON.parse(msg.body);
-
+        
         if (data.roomId !== roomId) return;
-
-        setForcedExit(data);
+          setForcedExit(data);
       });
 
       client.subscribe(`/topic/rooms/${roomId}/participants`, (msg) => {
@@ -161,10 +154,8 @@ const ChatRoom = () => {
     };
   }, [roomId]);
   
+  // 초기 REST 로드
 
-  /* ==================================================
-     초기 REST 데이터 로드
-  ================================================== */
   const reloadParticipants = async () => {
     const res = await api.get(`/rooms/${roomId}/participants`);
     setParticipants(res.data);
@@ -194,9 +185,7 @@ const ChatRoom = () => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* ==================================================
-     메시지 전송
-  ================================================== */
+
   const sendMessage = () => {
     if (!input.trim()) return;
 
@@ -287,9 +276,6 @@ const handleGrantAdmin = (user) => {
   });
 };
 
-  /* ==================================================
-     RENDER
-  ================================================== */
   return (
     <div className="chatroom-wrapper">
       {/* HEADER */}
@@ -304,11 +290,8 @@ const handleGrantAdmin = (user) => {
       </div>
       {/* MAIN */}  
       <div className="chatroom-main">
-          {/* ✅ LEFT SIDEBAR (ADMIN / OWNER만 렌더링) */}
           {canToggleSidebar && (
             <div className={`left-sidebar ${sidebarOpen ? "open" : "closed"}`}>
-
-              {/* 토글 버튼 */}
               <button
                 className="sidebar-toggle"
                 onClick={() => setSidebarOpen((v) => !v)}
@@ -317,7 +300,6 @@ const handleGrantAdmin = (user) => {
                 {sidebarOpen ? "◀" : "▶"}
               </button>
 
-              {/* PRIVATE 방 + 펼쳐진 상태일 때만 초대코드 UI */}
               {sidebarOpen && isPrivate && (
                 <InviteCodePanel
                   roomId={roomId}

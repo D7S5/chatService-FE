@@ -22,7 +22,7 @@ const ParticipantItem = ({
 
   const canKick = !isMe && (isOwner || isAdmin);
   const canBan = !isMe && isOwner;
-  const canGrantAdmin = !isMe && isOwner && p.role !== "OWNER"; // ⭐ 핵심
+  const canGrantAdmin = !isMe && isOwner && p.role !== "OWNER";
 
   /** 바깥 클릭 시 닫기 */
   useEffect(() => {

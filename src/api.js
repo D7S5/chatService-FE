@@ -7,10 +7,8 @@ const api = axios.create({
   withCredentials: true,
 });
 
-
 let refreshPromise = null;
 let requestQueue = [];
-
 
 function resolveQueue(token) {
   requestQueue.forEach(p => p.resolve(token));
