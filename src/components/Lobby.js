@@ -201,7 +201,7 @@ const loadDMRooms = async () => {
     }
   };
 
-  /** 친구 요청 수락 */
+  /* 친구 요청 수락 */
   const acceptFriendRequest = async (requestId) => {
     try {
       const res = await api.post(`/user/friends/accept/${requestId}`);
@@ -224,7 +224,7 @@ const loadDMRooms = async () => {
   }
 };
 
-  /** 친구 요청 거절 */
+  /* 친구 요청 거절 */
   const rejectFriendRequest = async (requestId) => {
     try {
       await api.post(`/user/friends/reject/${requestId}`);
@@ -284,7 +284,6 @@ const handleJoinByInvite = async () => {
     setInviteCode("");
   }
 };
-
 
   return (
     <div className="lobby-wrapper">
@@ -431,21 +430,36 @@ const handleJoinByInvite = async () => {
 
         {/* 받은 친구 요청 */}
         <div className="card friend-requests">
-          <h3>📨 받은 친구 요청</h3>
-          {friendRequests.length === 0 ? (
-            <p className="empty-text">요청이 없습니다.</p>
-          ) : (
-            <ul className="list">
-              {friendRequests.map(req => (
-                <li key={req.id}>
-                  <span>{req.fromUserNickname + " "}</span>
-                  <button onClick={() => acceptFriendRequest(req.id)}>수락</button>
-                  <button onClick={() => rejectFriendRequest(req.id)}>거절</button>
-                </li>
-              ))}
-            </ul>
-          )}
-        </div>
+            <h3>📨 받은 친구 요청</h3>
+            {friendRequests.length === 0 ? (
+              <p className="empty-text">요청이 없습니다.</p>
+            ) : (
+              <ul className="list">
+                {friendRequests.map(req => (
+                  <li key={req.id} className="request-item">
+                    <span className="nickname">
+                      {req.fromUserNickname}
+                    </span>
+
+                    <div className="actions">
+                      <button
+                        className="accept"
+                        onClick={() => acceptFriendRequest(req.id)}
+                      >
+                        수락
+                      </button>
+                      <button
+                        className="reject"
+                        onClick={() => rejectFriendRequest(req.id)}
+                      >
+                        거절
+                      </button>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </div>
         {/* 친구 목록 */}
         <div className="card friends">
           <h3>👥 친구 목록</h3>

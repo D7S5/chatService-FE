@@ -1,81 +1,201 @@
-/* 전체 래퍼 */
-.lobby-wrapper {
-  max-width: 1200px;
-  margin: 40px auto;
-  font-family: "Pretendard", "Noto Sans KR", sans-serif;
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+/* Lobby.css */
+:root {
+  --bg: #0f1115;
+  --panel: #161a22;
+  --panel-2: #1b2130;
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6eaf2;
+  --muted: rgba(230, 234, 242, 0.7);
+  --muted-2: rgba(230, 234, 242, 0.5);
+
+  --accent: #5865f2;
+  --accent-2: #4752c4;
+  --danger: #ed4245;
+  --success: #23a55a;
+
+  --shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  --radius: 14px;
 }
 
-/* 헤더 */
-.lobby-header {
+* {
+  box-sizing: border-box;
+}
+
+body {
+  background: radial-gradient(1200px 600px at 30% 10%, rgba(88, 101, 242, 0.12), transparent 60%),
+              radial-gradient(900px 500px at 80% 30%, rgba(35, 165, 90, 0.08), transparent 55%),
+              var(--bg);
+  color: var(--text);
+}
+
+/* 전체 래퍼 */
+.lobby-wrapper {
+  min-height: 100vh;
+  padding: 28px 18px 40px;
   display: flex;
+  flex-direction: column;
+  gap: 18px;
+  max-width: 1100px;
+  margin: 0 auto;
+}
+
+/* 상단 헤더 */
+.lobby-header {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 18px 18px 14px;
+  display: grid;
+  grid-template-columns: 1fr auto auto;
+  grid-auto-rows: min-content;
+  gap: 12px;
   align-items: center;
-  justify-content: space-between;
-  background: #ffffff;
-  padding: 20px 30px;
-  border-radius: 14px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
 }
 
 .lobby-header h2 {
   margin: 0;
-  font-size: 1.8rem;
+  font-size: 18px;
+  letter-spacing: 0.2px;
+}
+
+.welcome {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  grid-column: 1 / -1;
+}
+
+.welcome strong {
+  color: var(--text);
+}
+
+/* 초대코드 입력 박스 */
+.invite-box {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  grid-column: 1 / -1;
+}
+
+.invite-box input {
+  flex: 1;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  outline: none;
+}
+
+.invite-box input::placeholder {
+  color: var(--muted-2);
+}
+
+.invite-box input:focus {
+  border-color: rgba(88, 101, 242, 0.55);
+  box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.18);
+}
+
+.invite-box button {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(88, 101, 242, 0.35);
+  background: rgba(88, 101, 242, 0.18);
+  color: var(--text);
   font-weight: 700;
-}
-
-.lobby-header .welcome {
-  font-size: 1rem;
-  color: #555;
-}
-
-.lobby-header button {
-  padding: 8px 16px;
-  border-radius: 10px;
-  border: none;
-  background: #4a90e2;
-  color: white;
-  font-weight: 500;
   cursor: pointer;
-  transition: 0.2s;
+  transition: transform 0.06s ease, background 0.15s ease, border-color 0.15s ease;
 }
 
-.lobby-header button:hover {
-  background: #357abd;
+.invite-box button:hover {
+  background: rgba(88, 101, 242, 0.26);
+  border-color: rgba(88, 101, 242, 0.55);
 }
 
-/* 그리드 레이아웃 */
+.invite-box button:active {
+  transform: translateY(1px);
+}
+
+.invite-box button:disabled,
+.invite-box input:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+/* 헤더 버튼들 */
+.lobby-header > button {
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.06s ease;
+}
+
+.lobby-header > button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.lobby-header > button:active {
+  transform: translateY(1px);
+}
+
+.logout-btn {
+  border-color: rgba(237, 66, 69, 0.35) !important;
+  background: rgba(237, 66, 69, 0.12) !important;
+}
+
+.logout-btn:hover {
+  background: rgba(237, 66, 69, 0.18) !important;
+}
+
+/* 그리드 */
 .lobby-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 20px;
+  grid-template-columns: 1.2fr 0.9fr 0.9fr;
+  gap: 14px;
+  align-items: start;
 }
 
 /* 카드 공통 */
 .card {
-  background: #ffffff;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.035), rgba(255, 255, 255, 0.02));
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: var(--shadow);
+  padding: 14px;
+  overflow: hidden;
 }
 
 .card h3 {
-  margin: 0 0 10px 0;
-  font-size: 1.2rem;
-  font-weight: 600;
-  border-bottom: 1px solid #eee;
-  padding-bottom: 6px;
+  margin: 0;
+  font-size: 15px;
 }
 
-/* 리스트 */
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.empty-text {
+  margin: 10px 0 0;
+  color: var(--muted-2);
+  font-size: 13px;
+}
+
+/* 리스트 공통 */
 .list {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 10px 0 0;
   display: flex;
   flex-direction: column;
   gap: 8px;
@@ -85,181 +205,292 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 8px 12px;
-  border-radius: 10px;
-  background: #f9f9f9;
-  transition: 0.2s;
+  gap: 10px;
+
+  padding: 10px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background 0.15s ease, border-color 0.15s ease;
 }
 
 .list-item:hover {
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.1);
 }
 
-.list-item span {
-  font-weight: 500;
-  color: #333;
-}
-
-/* 버튼 */
-.join-btn, .dm-btn, .create-btn {
-  padding: 6px 12px;
-  border-radius: 8px;
-  border: none;
-  cursor: pointer;
-  font-size: 0.9rem;
-  font-weight: 500;
-  transition: 0.2s;
-}
-
-.join-btn {
-  background: #4a90e2;
-  color: white;
-}
-
-.join-btn:hover {
-  background: #357abd;
-}
-
-.dm-btn {
-  background: #7ed321;
-  color: white;
-}
-
-.dm-btn:hover {
-  background: #5ea017;
-}
-
-.create-btn {
-  background: #f5a623;
-  color: white;
-}
-
-.create-btn:hover {
-  background: #d4881e;
-}
-
-/* 입력폼 */
-.card form {
-  display: flex;
-  gap: 10px;
-}
-
-.card input[type="text"] {
-  flex: 1;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #ddd;
-  font-size: 0.95rem;
-}
-
-/* DM 뱃지 */
-.dm-badge {
-  display: inline-block;
-  margin-left: 6px;
-  background: #FF3B30;
-  color: white;
-  font-size: 0.7rem;
-  font-weight: 600;
-  padding: 2px 6px;
-  border-radius: 8px;
-}
-
-/* 접속 상태 */
-.user-status {
-  display: inline-block;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  margin-right: 6px;
-}
-
-.user-online {
-  background: #4cd964;
-}
-
-.user-offline {
-  background: #bbb;
-}
-
-/* 비어있을 때 */
-.empty-text {
-  font-size: 0.9rem;
-  color: #888;
-}
-
-/* 오류 메시지 */
-.error-message {
-  color: #e74c3c;
-  font-weight: 600;
-  text-align: center;
-}
-
-.card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-.create-room-btn {
-  background: #0b1c79;
-  color: white;
-  border: none;
-  padding: 6px 10px;
-  border-radius: 6px;
-  cursor: pointer;
-}
-
-.large-room-badge {
-  margin-left: 6px;
-  font-size: 0.7rem;
-  padding: 2px 6px;
-  border-radius: 6px;
-  background: #e6f0ff;
-  color: #2a5bd7;
-}
-
+/* 방 목록 */
 .room-info {
   display: flex;
   flex-direction: column;
+  gap: 4px;
+  min-width: 0;
 }
 
 .room-name {
-  font-weight: 600;
+  font-weight: 800;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .room-count {
-  font-size: 0.8rem;
-  color: #666;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.join-btn {
+  height: 34px;
+  padding: 0 12px;
+  border-radius: 10px;
+  border: 1px solid rgba(88, 101, 242, 0.35);
+  background: rgba(88, 101, 242, 0.18);
+  color: var(--text);
+  font-weight: 800;
+  cursor: pointer;
+  transition: background 0.15s ease, transform 0.06s ease;
+}
+
+.join-btn:hover {
+  background: rgba(88, 101, 242, 0.26);
+}
+
+.join-btn:active {
+  transform: translateY(1px);
 }
 
 .join-btn:disabled {
-  background: #ccc;
+  opacity: 0.55;
   cursor: not-allowed;
 }
 
-.invite-box {
-  display: flex;
-  gap: 8px;
-  margin: 12px 0 20px;
-}
-
-.invite-box input {
-  flex: 1;
-  padding: 8px;
-  border-radius: 6px;
-  border: 1px solid #ccc;
-}
-
-.invite-box button {
-  padding: 8px 14px;
-  border-radius: 6px;
-  border: none;
-  background-color: #4caf50;
-  color: white;
+/* 생성 버튼 */
+.create-room-btn {
+  height: 34px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
   cursor: pointer;
+  font-weight: 800;
+  transition: background 0.15s ease, transform 0.06s ease;
 }
 
-.invite-box button:disabled {
-  background-color: #aaa;
+.create-room-btn:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.create-room-btn:active {
+  transform: translateY(1px);
+}
+
+/* DM */
+.dm .list-item span {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.dm-btn {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(88, 101, 242, 0.35);
+  background: rgba(88, 101, 242, 0.14);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+  transition: background 0.15s ease, transform 0.06s ease;
+}
+
+.dm-btn:hover {
+  background: rgba(88, 101, 242, 0.22);
+}
+
+.dm-btn:active {
+  transform: translateY(1px);
+}
+
+.dm-badge {
+  min-width: 18px;
+  height: 18px;
+  padding: 0 6px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 900;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(237, 66, 69, 0.95);
+  color: white;
+}
+
+/* 접속 중 사용자 카드 */
+.online .list-item button {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+  transition: background 0.15s ease;
+}
+
+.online .list-item button:hover {
+  background: rgba(255, 255, 255, 0.07);
+}
+
+.online .list-item button:disabled {
+  opacity: 0.55;
   cursor: not-allowed;
+}
+
+/* 친구 요청 */
+.friend-requests ul li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+
+  padding: 10px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+.friend-requests ul li span {
+  color: var(--text);
+  font-weight: 800;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.friend-requests ul li button {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 800;
+}
+
+.friend-requests ul li button:first-of-type {
+  border-color: rgba(35, 165, 90, 0.35);
+  background: rgba(35, 165, 90, 0.12);
+}
+
+.friend-requests ul li button:first-of-type:hover {
+  background: rgba(35, 165, 90, 0.18);
+}
+
+.friend-requests ul li button:last-of-type {
+  border-color: rgba(237, 66, 69, 0.35);
+  background: rgba(237, 66, 69, 0.12);
+}
+
+.friend-requests ul li button:last-of-type:hover {
+  background: rgba(237, 66, 69, 0.18);
+}
+
+/* 친구 목록 */
+.user-status {
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  display: inline-block;
+  margin-right: 8px;
+  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.25);
+}
+
+.user-online {
+  background: var(--success);
+}
+
+.user-offline {
+  background: rgba(255, 255, 255, 0.35);
+}
+
+.friends .username {
+  font-weight: 900;
+  flex: 1;
+  min-width: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* 위험 버튼 */
+.danger-btn {
+  height: 32px;
+  padding: 0 10px;
+  border-radius: 10px;
+  border: 1px solid rgba(237, 66, 69, 0.35);
+  background: rgba(237, 66, 69, 0.12);
+  color: var(--text);
+  cursor: pointer;
+  font-weight: 900;
+  transition: background 0.15s ease, transform 0.06s ease;
+}
+
+.danger-btn:hover {
+  background: rgba(237, 66, 69, 0.18);
+}
+
+.danger-btn:active {
+  transform: translateY(1px);
+}
+
+/* 에러 */
+.error-message {
+  margin: 0;
+  color: rgba(237, 66, 69, 0.95);
+  font-weight: 800;
+}
+
+/* 반응형 */
+@media (max-width: 980px) {
+  .lobby-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media (max-width: 680px) {
+  .lobby-wrapper {
+    padding: 18px 12px 32px;
+  }
+
+  .lobby-header {
+    grid-template-columns: 1fr;
+  }
+
+  .lobby-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .invite-box {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .invite-box button {
+    width: 100%;
+  }
+}
+
+.request-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* 🔥 좌우 끝 정렬 */
+  padding: 12px 14px;
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
 }

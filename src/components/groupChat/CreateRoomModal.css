@@ -1,3 +1,47 @@
+/* ===== FIX: 패널 겹침 강제 방지 ===== */
+
+/* main은 무조건 grid */
+.chatroom-main {
+  display: grid !important;
+  min-height: 0 !important;
+}
+
+/* 사이드바 있을 때/없을 때 영역 고정 */
+.chatroom-main.with-sidebar {
+  grid-template-columns: 240px minmax(0, 1fr) 260px !important;
+  grid-template-areas: "left messages participants" !important;
+}
+
+.chatroom-main.no-sidebar {
+  grid-template-columns: minmax(0, 1fr) 260px !important;
+  grid-template-areas: "messages participants" !important;
+}
+
+/* 각 패널을 grid area로 강제 고정 */
+.left-sidebar { grid-area: left; }
+.messages { grid-area: messages; }
+.participants { grid-area: participants; }
+
+/* ✅ absolute/fixed 걸려있으면 무조건 해제 */
+.left-sidebar,
+.messages,
+.participants {
+  position: relative !important;
+  inset: auto !important;
+  top: auto !important;
+  right: auto !important;
+  bottom: auto !important;
+  left: auto !important;
+  transform: none !important;
+}
+
+/* 패널이 내용 때문에 밀고 들어오는 것 방지 */
+.messages, .participants, .left-sidebar {
+  width: auto !important;
+  min-width: 0 !important;
+}
+
+
 .modal-overlay {
   position: fixed;
   inset: 0;

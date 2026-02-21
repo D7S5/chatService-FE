@@ -1,70 +1,180 @@
+/* ParticipantItem.css */
+
+:root {
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6eaf2;
+  --muted: rgba(230, 234, 242, 0.7);
+  --muted-2: rgba(230, 234, 242, 0.5);
+
+  --accent: #5865f2;
+  --success: #23a55a;
+  --danger: #ed4245;
+  --warning: #faa61a;
+
+  --radius: 12px;
+}
+
 .participant-item {
   position: relative;
-  padding: 6px 8px;
-  cursor: pointer;
   display: flex;
   align-items: center;
   justify-content: space-between;
+  gap: 10px;
+
+  padding: 10px 10px;
+  border-radius: var(--radius);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.06);
+
+  cursor: default;
+  user-select: none;
+
+  transition: background 0.15s ease, border-color 0.15s ease, transform 0.06s ease;
 }
 
 .participant-item:hover {
-  background: #f5f5f5;
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.10);
+}
+
+/* 클릭 가능한 항목 느낌(권한 있으면 메뉴가 열리니까) */
+.participant-item:active {
+  transform: translateY(1px);
 }
 
 .participant-item.me {
-  cursor: default;
+  border-color: rgba(88, 101, 242, 0.28);
+  background: rgba(88, 101, 242, 0.10);
 }
 
+/* user info */
 .user {
-  display: flex;
+  display: inline-flex;
   align-items: center;
-  gap: 6px;
+  gap: 8px;
+  min-width: 0;
 }
 
 .name {
-  font-size: 14px;
+  font-weight: 900;
+  color: var(--text);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* role icons */
+.role {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 22px;
+  height: 22px;
+
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.22);
+
+  font-size: 13px;
+  line-height: 1;
 }
 
 .role.owner {
-  color: gold;
+  border-color: rgba(250, 166, 26, 0.35);
+  background: rgba(250, 166, 26, 0.14);
 }
 
 .role.admin {
-  color: #4aa3ff;
+  border-color: rgba(88, 101, 242, 0.35);
+  background: rgba(88, 101, 242, 0.14);
 }
 
-/* ===== MENU ===== */
-
+/* ===== menu (popover) ===== */
 .menu {
   position: absolute;
-  right: 6px;
-  top: 28px;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 6px;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
-  z-index: 10;
-  min-width: 80px;
+  top: calc(100% + 8px);
+  right: 8px;
+
+  width: 160px;
+  padding: 8px;
+
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: linear-gradient(180deg, rgba(25, 30, 42, 0.98), rgba(20, 24, 34, 0.98));
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.5);
+
+  z-index: 50;
 }
 
+/* 작은 화살표 */
+.menu::before {
+  content: "";
+  position: absolute;
+  top: -6px;
+  right: 18px;
+  width: 12px;
+  height: 12px;
+  background: rgba(25, 30, 42, 0.98);
+  border-left: 1px solid rgba(255, 255, 255, 0.10);
+  border-top: 1px solid rgba(255, 255, 255, 0.10);
+  transform: rotate(45deg);
+}
+
+/* menu items */
 .menu-item {
   width: 100%;
-  padding: 6px;
-  font-size: 13px;
-  border: none;
-  background: none;
+  height: 34px;
+  padding: 0 10px;
+
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+
   cursor: pointer;
+  font-weight: 900;
+  text-align: left;
+
+  transition: background 0.15s ease, transform 0.06s ease, border-color 0.15s ease;
+}
+
+.menu-item + .menu-item {
+  margin-top: 8px;
 }
 
 .menu-item:hover {
-  background: #f0f0f0;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.menu-item:active {
+  transform: translateY(1px);
+}
+
+/* special types */
+.menu-item.admin {
+  border-color: rgba(88, 101, 242, 0.30);
+  background: rgba(88, 101, 242, 0.14);
+}
+
+.menu-item.admin:hover {
+  background: rgba(88, 101, 242, 0.22);
 }
 
 .menu-item.kick {
-  color: #333;
+  border-color: rgba(250, 166, 26, 0.30);
+  background: rgba(250, 166, 26, 0.12);
+}
+
+.menu-item.kick:hover {
+  background: rgba(250, 166, 26, 0.18);
 }
 
 .menu-item.ban {
-  color: red;
-  font-weight: bold;
+  border-color: rgba(237, 66, 69, 0.35);
+  background: rgba(237, 66, 69, 0.12);
+}
+
+.menu-item.ban:hover {
+  background: rgba(237, 66, 69, 0.18);
 }

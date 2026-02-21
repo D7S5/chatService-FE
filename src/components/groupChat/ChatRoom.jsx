@@ -288,8 +288,7 @@ const handleGrantAdmin = (user) => {
           나가기
         </button>
       </div>
-      {/* MAIN */}  
-      <div className="chatroom-main">
+      <div className={`chatroom-main ${canToggleSidebar ? "with-sidebar" : "no-sidebar"}`}>
           {canToggleSidebar && (
             <div className={`left-sidebar ${sidebarOpen ? "open" : "closed"}`}>
               <button

@@ -2,7 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { connectWebSocket, getClient } from "../websocket"; // websocket.js 사용
 import api from "../api";
-import "../Chat.css"; // 아래 CSS 사용
+import "../Chat.css";
 
 const PrivateChat = () => {
   const { roomId } = useParams();

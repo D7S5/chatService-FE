@@ -1,75 +1,129 @@
+/* InviteCodePanel.css */
+
+/* ChatRoom.css와 톤 맞추기(없어도 되지만 단독 사용 대비) */
+:root {
+  --border: rgba(255, 255, 255, 0.08);
+  --text: #e6eaf2;
+  --muted: rgba(230, 234, 242, 0.7);
+  --muted-2: rgba(230, 234, 242, 0.5);
+
+  --accent: #5865f2;
+  --accent-2: #4752c4;
+  --danger: #ed4245;
+
+  --radius: 14px;
+}
+
 .invite-container {
-  margin-top: 16px;
-  padding: 16px;
-  border-radius: 10px;
-  background-color: #f9fafb;
-  border: 1px solid #e5e7eb;
-  max-width: 360px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
 
+/* 초대코드 생성 버튼 */
 .invite-button {
-  width: 100%;
-  padding: 10px 14px;
-  border-radius: 8px;
-  border: none;
-  background-color: #2563eb;
-  color: white;
-  font-weight: 600;
+  height: 40px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(88, 101, 242, 0.35);
+  background: rgba(88, 101, 242, 0.18);
+  color: var(--text);
+  font-weight: 900;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.15s ease, transform 0.06s ease, border-color 0.15s ease;
 }
 
-.invite-button:hover:not(:disabled) {
-  background-color: #1d4ed8;
+.invite-button:hover {
+  background: rgba(88, 101, 242, 0.26);
+  border-color: rgba(88, 101, 242, 0.55);
+}
+
+.invite-button:active {
+  transform: translateY(1px);
 }
 
 .invite-button:disabled {
-  background-color: #9ca3af;
+  opacity: 0.6;
   cursor: not-allowed;
 }
 
+/* 초대코드 박스 */
 .invite-code-box {
-  margin-top: 14px;
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  background: linear-gradient(
+    180deg,
+    rgba(255, 255, 255, 0.04),
+    rgba(255, 255, 255, 0.02)
+  );
   padding: 12px;
-  border-radius: 8px;
-  background-color: #ffffff;
-  border: 1px dashed #93c5fd;
-  text-align: center;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+  align-items: center;
 }
 
+/* 코드 텍스트 */
 .invite-code {
-  display: block;
-  font-size: 18px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: #1e3a8a;
-  margin-bottom: 8px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas,
+    "Liberation Mono", "Courier New", monospace;
+  font-weight: 900;
+  letter-spacing: 0.4px;
+  color: var(--text);
+
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.10);
+  background: rgba(0, 0, 0, 0.25);
+
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
+/* 복사 버튼 */
 .copy-button {
-  padding: 6px 12px;
-  border-radius: 6px;
-  border: none;
-  background-color: #10b981;
-  color: white;
-  font-size: 13px;
-  font-weight: 600;
+  height: 38px;
+  padding: 0 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-weight: 900;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.15s ease, transform 0.06s ease;
 }
 
 .copy-button:hover {
-  background-color: #059669;
+  background: rgba(255, 255, 255, 0.07);
 }
 
+.copy-button:active {
+  transform: translateY(1px);
+}
+
+/* 만료 안내 */
 .invite-expire {
-  margin-top: 6px;
+  grid-column: 1 / -1;
+  margin: 0;
   font-size: 12px;
-  color: #6b7280;
+  color: var(--muted-2);
 }
 
+/* 에러 */
 .invite-error {
-  margin-top: 10px;
+  margin: 0;
   font-size: 13px;
-  color: #dc2626;
+  color: rgba(237, 66, 69, 0.95);
+  font-weight: 800;
+}
+
+/* 좁을 때 정렬 */
+@media (max-width: 360px) {
+  .invite-code-box {
+    grid-template-columns: 1fr;
+  }
+  .copy-button {
+    width: 100%;
+  }
 }
