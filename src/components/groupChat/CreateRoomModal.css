@@ -1,113 +1,223 @@
-/* ===== FIX: 패널 겹침 강제 방지 ===== */
+/* CreateRoomModal.css */
 
-/* main은 무조건 grid */
-.chatroom-main {
-  display: grid !important;
-  min-height: 0 !important;
+:root {
+  --bg: #0f1115;
+  --panel: rgba(22, 26, 34, 0.96);
+  --border: rgba(255, 255, 255, 0.10);
+  --border2: rgba(255, 255, 255, 0.14);
+  --text: #e6eaf2;
+  --muted: rgba(230, 234, 242, 0.7);
+  --muted2: rgba(230, 234, 242, 0.5);
+
+  --accent: #5865f2;
+  --accent2: #4752c4;
+  --danger: #ed4245;
+  --shadow: 0 18px 46px rgba(0, 0, 0, 0.55);
+
+  --radius: 16px;
 }
-
-/* 사이드바 있을 때/없을 때 영역 고정 */
-.chatroom-main.with-sidebar {
-  grid-template-columns: 240px minmax(0, 1fr) 260px !important;
-  grid-template-areas: "left messages participants" !important;
-}
-
-.chatroom-main.no-sidebar {
-  grid-template-columns: minmax(0, 1fr) 260px !important;
-  grid-template-areas: "messages participants" !important;
-}
-
-/* 각 패널을 grid area로 강제 고정 */
-.left-sidebar { grid-area: left; }
-.messages { grid-area: messages; }
-.participants { grid-area: participants; }
-
-/* ✅ absolute/fixed 걸려있으면 무조건 해제 */
-.left-sidebar,
-.messages,
-.participants {
-  position: relative !important;
-  inset: auto !important;
-  top: auto !important;
-  right: auto !important;
-  bottom: auto !important;
-  left: auto !important;
-  transform: none !important;
-}
-
-/* 패널이 내용 때문에 밀고 들어오는 것 방지 */
-.messages, .participants, .left-sidebar {
-  width: auto !important;
-  min-width: 0 !important;
-}
-
 
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0,0,0,0.5);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 1000;
+  z-index: 9999;
+
+  display: grid;
+  place-items: center;
+  padding: 18px;
+
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(8px);
 }
 
 .modal {
-  background: #fff;
-  padding: 24px;
-  border-radius: 12px;
-  width: 420px;
+  width: min(520px, 92vw);
+  border-radius: var(--radius);
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+
+  background: linear-gradient(
+      180deg,
+      rgba(255, 255, 255, 0.05),
+      rgba(255, 255, 255, 0.02)
+    ),
+    var(--panel);
+
+  padding: 18px;
+  color: var(--text);
+}
+
+.modal h2 {
+  margin: 0 0 14px 0;
+  font-size: 18px;
+  font-weight: 900;
+  letter-spacing: 0.2px;
 }
 
 .modal label {
   display: block;
-  margin-top: 12px;
-  font-weight: 600;
+  margin: 12px 0 8px;
+  font-size: 12px;
+  font-weight: 900;
+  color: var(--muted);
 }
 
-.modal input,
+/* inputs / select */
+.modal input[type="text"],
+.modal input[type="number"],
 .modal select {
   width: 100%;
-  padding: 8px;
-  margin-top: 4px;
+  height: 42px;
+  padding: 0 12px;
+
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: rgba(255, 255, 255, 0.03);
+  color: var(--text);
+  outline: none;
 }
 
+.modal input::placeholder {
+  color: var(--muted2);
+}
+
+.modal input[type="text"]:focus,
+.modal input[type="number"]:focus,
+.modal select:focus {
+  border-color: rgba(88, 101, 242, 0.55);
+  box-shadow: 0 0 0 4px rgba(88, 101, 242, 0.18);
+}
+
+/* range + number row */
 .range-box {
-  display: flex;
+  display: grid;
+  grid-template-columns: 1fr 110px;
   gap: 10px;
   align-items: center;
 }
 
-.range-box input[type="number"] {
-  width: 90px;
+/* range input styling */
+.modal input[type="range"] {
+  width: 100%;
+  height: 26px;
+  background: transparent;
+  margin: 0;
+  outline: none;
 }
 
+/* WebKit */
+.modal input[type="range"]::-webkit-slider-runnable-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.modal input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 18px;
+  height: 18px;
+  margin-top: -6px;
+  border-radius: 999px;
+
+  background: rgba(88, 101, 242, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+}
+
+/* Firefox */
+.modal input[type="range"]::-moz-range-track {
+  height: 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.10);
+  border: 1px solid rgba(255, 255, 255, 0.10);
+}
+
+.modal input[type="range"]::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 999px;
+  background: rgba(88, 101, 242, 0.95);
+  border: 2px solid rgba(255, 255, 255, 0.35);
+  cursor: pointer;
+}
+
+/* badge (옵션) */
 .large-badge {
   margin-top: 10px;
-  padding: 8px;
-  background: #eef4ff;
-  color: #2a5bd7;
-  border-radius: 6px;
-  font-size: 0.9rem;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(250, 166, 26, 0.30);
+  background: rgba(250, 166, 26, 0.12);
+  color: rgba(250, 166, 26, 0.95);
+  font-weight: 900;
+  font-size: 12px;
+}
+.large-badge::before {
+  content: "⚡ 대형 방(100명 이상) — 서버/DB 부하를 고려하세요";
 }
 
+/* error */
+.error {
+  margin: 12px 0 0;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(237, 66, 69, 0.35);
+  background: rgba(237, 66, 69, 0.12);
+  color: rgba(237, 66, 69, 0.95);
+  font-weight: 900;
+  font-size: 13px;
+}
+
+/* actions */
 .actions {
+  margin-top: 16px;
   display: flex;
   justify-content: flex-end;
   gap: 10px;
-  margin-top: 20px;
 }
 
-.cancel {
-  background: #ddd;
+.actions button {
+  height: 40px;
+  padding: 0 14px;
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  font-weight: 900;
+  cursor: pointer;
+
+  transition: background 0.15s ease, transform 0.06s ease, border-color 0.15s ease;
 }
 
-.create {
-  background: #4a7cff;
-  color: white;
+.actions button:hover {
+  background: rgba(255, 255, 255, 0.07);
 }
 
-.error {
-  color: red;
-  margin-top: 10px;
+.actions button:active {
+  transform: translateY(1px);
+}
+
+.actions .cancel {
+  border-color: rgba(255, 255, 255, 0.14);
+  background: rgba(255, 255, 255, 0.04);
+}
+
+.actions .create {
+  border-color: rgba(88, 101, 242, 0.35);
+  background: rgba(88, 101, 242, 0.18);
+}
+
+.actions .create:hover {
+  border-color: rgba(88, 101, 242, 0.55);
+  background: rgba(88, 101, 242, 0.26);
+}
+
+/* small screens */
+@media (max-width: 420px) {
+  .range-box {
+    grid-template-columns: 1fr;
+  }
 }
