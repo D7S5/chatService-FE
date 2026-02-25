@@ -4,7 +4,6 @@ import LoginUnified from "./components/LoginUnified";
 import Signup from "./components/Signup";
 import NicknameSetup from "./components/NicknameSetup";
 import Lobby from "./components/Lobby";
-import Chat from "./components/Chat";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { ToastContainer } from "react-toastify";
 import PrivateChat from "./components/PrivateChat";
@@ -24,7 +23,6 @@ function App() {
         <Route path="/signup" element={<Signup />} />
         <Route path="/nickname" element={<NicknameSetup setUsername={setUsername} />} />
         <Route path="/lobby" element={<Lobby username={username} />} />
-        <Route path="/chat/:roomId" element={<Chat />} />
         <Route path="/rooms/:roomId" element={<ChatRoom />} />
         <Route path="/dm/list" element={<DMList />} />
         <Route path="/dm/:roomId" element={<PrivateChat />} />
