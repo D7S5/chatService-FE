@@ -114,6 +114,9 @@ const ChatRoom = () => {
 
       /** 채팅 메시지 */
       client.subscribe(`/topic/chat/${roomId}`, (msg) => {
+        const data = JSON.parse(msg.body);
+          console.log("WS msg:", data);
+          console.log("sentAt:", data.sentAt, "createdAt:", data.createdAt);
         setMessages((prev) => [...prev, JSON.parse(msg.body)]);
       });
 
@@ -217,14 +220,15 @@ const ChatRoom = () => {
     navigate("/lobby");
   };
 
-  const formatTime = (iso) => {
-    const d = new Date(iso);
-    return d.toLocaleTimeString("ko-KR", {
-      hour: "2-digit",
-      minute: "2-digit",
-      hour12: false,
-    });
-  };
+  const formatTime = (ts) => {
+  const d = new Date(ts);
+  if (isNaN(d.getTime())) return "";
+  return d.toLocaleTimeString("ko-KR", {
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: false,
+  });
+};
 
   const kickUser = async (targetUserId) => {
   try {
@@ -276,6 +280,8 @@ const handleGrantAdmin = (user) => {
   });
 };
 
+const getTs = (m) => m.sentAt ?? m.createdAt;
+
   return (
     <div className="chatroom-wrapper">
       {/* HEADER */}
@@ -318,7 +324,7 @@ const handleGrantAdmin = (user) => {
             const showTime =
               !prev ||
               prev.senderId !== msg.senderId ||
-              new Date(msg.createdAt) - new Date(prev.createdAt) > 60 * 1000;
+              new Date(msg.sentAt) - new Date(prev.sentAt) > 60 * 1000;
 
             return (
               <div key={idx} className={`message ${mine ? "me" : "other"}`}>
@@ -326,13 +332,13 @@ const handleGrantAdmin = (user) => {
                 <div className="bubble-row">
                   {!mine && showTime && (
                     <span className="time left">
-                      {formatTime(msg.createdAt)}
+                      {formatTime(msg.sentAt)}
                     </span>
                   )}
                   <div className="bubble">{msg.content}</div>
                   {mine && showTime && (
                     <span className="time right">
-                      {formatTime(msg.createdAt)}
+                      {formatTime(msg.sentAt)}
                     </span>
                   )}
                 </div>
