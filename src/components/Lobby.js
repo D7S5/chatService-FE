@@ -10,7 +10,6 @@ const Lobby = () => {
   const [dmRooms, setDMRooms] = useState([]);
   const [friends, setFriends] = useState([]);
   const [onlineUsers, setOnlineUsers] = useState([]);
-  const [newRoomName, setNewRoomName] = useState("");
   const [friendRequests, setFriendRequests] = useState([]);
   const [sentFriendRequests, setSentFriendRequests] = useState([]);
   const [error, setError] = useState("");
