@@ -115,8 +115,6 @@ const ChatRoom = () => {
       /** 채팅 메시지 */
       client.subscribe(`/topic/chat/${roomId}`, (msg) => {
         const data = JSON.parse(msg.body);
-          console.log("WS msg:", data);
-          console.log("sentAt:", data.sentAt, "createdAt:", data.createdAt);
         setMessages((prev) => [...prev, JSON.parse(msg.body)]);
       });
 
