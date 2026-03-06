@@ -20,6 +20,12 @@ async function fetchWsToken() {
   }
 }
 
+const wsBase =
+  window.location.protocol === "https:"
+    ? `${window.location.origin}/ws`
+    : `${window.location.origin}/ws`;
+
+
 // -----------------------------------------------------------
 // 2) STOMP Client 생성 함수
 // -----------------------------------------------------------
@@ -27,7 +33,7 @@ async function createClient(onConnectCallback) {
   wsToken = await fetchWsToken();
 
   const stompClient = new Client({
-    webSocketFactory: () => new SockJS("http://localhost:9090/ws?ws-token=" + wsToken),
+    webSocketFactory: () => new SockJS(`${wsBase}?ws-token=` + wsToken),
     reconnectDelay: 5000,  // 자동 재연결
     heartbeatIncoming: 0,
     heartbeatOutgoing: 0,
