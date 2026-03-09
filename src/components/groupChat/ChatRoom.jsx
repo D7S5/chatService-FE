@@ -145,6 +145,13 @@ const ChatRoom = () => {
           )
         );
       });
+      client.publish({
+        destination: "/app/room.enter",
+        body: JSON.stringify({
+          roomId,
+          userId,
+        }),
+      });
 
       reloadParticipants();
       reloadCount();    
