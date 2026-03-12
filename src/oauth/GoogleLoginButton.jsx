@@ -5,7 +5,7 @@ import "./GoogleLoginButton.css";
 const GoogleLoginButton = () => {
   const handleLogin = () => {
     const baseUrl =
-      process.env.REACT_APP_API_BASE || "http://localhost:9090";
+      process.env.REACT_APP_API_BASE || window.location.origin;
 
     window.location.href = `${baseUrl}/oauth2/authorization/google`;
   };

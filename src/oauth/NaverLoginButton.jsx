@@ -3,7 +3,7 @@ import './NaverLoginButton.css'
 
 
 const NaverLoginButton = () => {
-  const baseUrl = process.env.REACT_APP_API_BASE || "http://localhost:9090";
+  const baseUrl = process.env.REACT_APP_API_BASE || window.location.origin;
 
   const handleLogin = () => {
     window.location.href = `${baseUrl}/oauth2/authorization/naver`;
