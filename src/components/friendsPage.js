@@ -47,7 +47,7 @@ const FriendsPage = () => {
     loadFriends();
     loadRequests();
   };
-
+u
   const rejectRequest = async (id) => {
     await api.post(`/friends/reject/${id}`);
     alert("거절했습니다.");

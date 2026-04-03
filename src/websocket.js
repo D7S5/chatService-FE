@@ -1,4 +1,3 @@
-// websocket.js
 import { Client } from "@stomp/stompjs";
 import SockJS from "sockjs-client";
 import api from "./api";
@@ -6,10 +5,8 @@ import api from "./api";
 let client = null;
 let wsToken = null;
 let connecting = false;
+let reconnectTimer = null;
 
-// -----------------------------------------------------------
-// 1) 120초 단기 WebSocket Token 발급
-// -----------------------------------------------------------
 async function fetchWsToken() {
   try {
     const res = await api.post("/ws/token");
@@ -20,32 +17,29 @@ async function fetchWsToken() {
   }
 }
 
+// 개발 환경에서는 백엔드 주소를 직접 사용
 const wsBase =
-  window.location.protocol === "https:"
-    ? `${window.location.origin}/ws`
+  process.env.NODE_ENV === "development"
+    ? "http://localhost:9090/ws"
     : `${window.location.origin}/ws`;
 
-
-// -----------------------------------------------------------
-// 2) STOMP Client 생성 함수
-// -----------------------------------------------------------
 async function createClient(onConnectCallback) {
   wsToken = await fetchWsToken();
 
   const stompClient = new Client({
-    webSocketFactory: () => new SockJS(`${wsBase}?ws-token=` + wsToken),
-    reconnectDelay: 5000,  // 자동 재연결
+    webSocketFactory: () => new SockJS(`${wsBase}?ws-token=${wsToken}`),
+    reconnectDelay: 5000,
     heartbeatIncoming: 0,
     heartbeatOutgoing: 0,
 
-    // 연결 성공 시
     onConnect: () => {
-      // console.log("WS Connected");  // debug
-
       if (onConnectCallback) onConnectCallback(stompClient);
 
-      setTimeout(() => {
-        // console.log("wsToken 만료 임박 → 재연결 시도"); // debug
+      if (reconnectTimer) {
+        clearTimeout(reconnectTimer);
+      }
+
+      reconnectTimer = setTimeout(() => {
         reconnect(onConnectCallback);
       }, 110 * 1000);
     },
@@ -55,42 +49,50 @@ async function createClient(onConnectCallback) {
     },
 
     onWebSocketClose: () => {
-      // console.warn("WebSocket Closed"); // debug
-    }
+      // console.warn("WebSocket Closed");
+    },
   });
 
   return stompClient;
 }
 
 export async function connectWebSocket(onConnectCallback) {
-  if (connecting) return;
+  if (connecting) return client;
   connecting = true;
 
   try {
     client = await createClient(onConnectCallback);
-    client.activate();   // 여기서 실제 연결
+    client.activate();
+    return client;
+  } catch (err) {
+    console.error("connectWebSocket failed:", err);
+    throw err;
   } finally {
     connecting = false;
   }
-
-  return client;
 }
-    
+
 async function reconnect(onConnectCallback) {
   if (connecting) return;
   connecting = true;
 
   try {
+    if (reconnectTimer) {
+      clearTimeout(reconnectTimer);
+      reconnectTimer = null;
+    }
+
     if (client && client.deactivate) {
       await client.deactivate();
     }
-  } catch (err) {
-    console.warn("Deactivate failed, continue:", err);
-  }
 
-  client = await createClient(onConnectCallback);
-  client.activate();
-  connecting = false;
+    client = await createClient(onConnectCallback);
+    client.activate();
+  } catch (err) {
+    console.error("Reconnect failed:", err);
+  } finally {
+    connecting = false;
+  }
 }
 
 export const getClient = () => client;

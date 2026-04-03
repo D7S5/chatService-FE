@@ -59,6 +59,7 @@ const PrivateChat = () => {
       roomId,
       // room: { roomId }, // V1
       senderId: userId,
+      senderName: username,
       content: input,
       sentAt : Date.now(), // timestamp
     };
@@ -98,7 +99,7 @@ const PrivateChat = () => {
           const isMine = msg.senderId === userId;
           return (
             <div key={idx} className={`message-row ${isMine ? "my-message" : ""}`}>
-              <div className="sender-name">{isMine ? "나" : username}</div>
+              <div className="sender-name">{isMine ? "나" : msg.senderName}</div>
               <div className="message-bubble">{msg.content}</div>
             <div className="time">{msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ""}</div>
             </div>
