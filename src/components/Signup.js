@@ -14,15 +14,18 @@ function Signup() {
   const handleSignup = async (e) => {
     e.preventDefault();
 
-    // 비밀번호 확인 체크
     if (password !== confirmPassword) {
       toast.error("비밀번호가 일치하지 않습니다.");
       return;
     }
 
     try {
-      // 백엔드 RegisterRequest 형식에 맞게 요청
       await api.post("/auth/register", { username, password, email });
+
+      console.log({
+          username,
+          email,
+        });
       toast.success("회원가입 성공! 로그인 페이지로 이동합니다.");
       navigate("/");
     } catch (err) {

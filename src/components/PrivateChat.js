@@ -15,7 +15,6 @@ const PrivateChat = () => {
   const userId = localStorage.getItem("userId");
   const username = localStorage.getItem("username");
 
-  // 🔹 WebSocket + 초기 메시지 로드
   useEffect(() => {
     if (!userId || !username) return navigate("/");
 
@@ -57,7 +56,6 @@ const PrivateChat = () => {
 
     const payload = {
       roomId,
-      // room: { roomId }, // V1
       senderId: userId,
       senderName: username,
       content: input,
