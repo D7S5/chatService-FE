@@ -21,11 +21,6 @@ function Signup() {
 
     try {
       await api.post("/auth/register", { username, password, email });
-
-      console.log({
-          username,
-          email,
-        });
       toast.success("회원가입 성공! 로그인 페이지로 이동합니다.");
       navigate("/");
     } catch (err) {

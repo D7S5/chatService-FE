@@ -23,12 +23,14 @@ const LoginUnified = () => {
         { withCredentials: true }
       );
 
+      console.log(res.data);
+
       const { accessToken, user } = res.data;
 
       localStorage.setItem("accessToken", accessToken);
       localStorage.setItem("userId", user.id);
       localStorage.setItem("username", user.username);
-
+            
       navigate("/lobby");
     } catch (err) {
       setError(err.response?.data?.message || "로그인 실패");
