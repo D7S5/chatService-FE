@@ -23,8 +23,6 @@ const LoginUnified = () => {
         { withCredentials: true }
       );
 
-      console.log(res.data);
-
       const { accessToken, user } = res.data;
 
       localStorage.setItem("accessToken", accessToken);
