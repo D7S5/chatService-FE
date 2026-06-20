@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { connectWebSocket, getClient } from "../websocket"; // websocket.js 사용
 import api from "../api";
+import { getClipboardImages, uploadChatImage } from "../chatImages";
 import "../Chat.css";
 
 const PrivateChat = () => {
@@ -10,6 +11,7 @@ const PrivateChat = () => {
 
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const bottomRef = useRef(null);
 
   const userId = localStorage.getItem("userId");
@@ -78,6 +80,46 @@ const PrivateChat = () => {
     setInput("");
   };
 
+  const handlePaste = async (event) => {
+    const images = getClipboardImages(event.clipboardData);
+    if (images.length === 0) return;
+
+    event.preventDefault();
+
+    const client = getClient();
+    if (!client?.connected) {
+      alert("채팅 서버에 연결되어 있지 않습니다.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      for (const image of images) {
+        const { imageUrl, originalFilename } = await uploadChatImage(image);
+        const payload = {
+          roomId,
+          senderId: userId,
+          senderName: username,
+          content: originalFilename || image.name || "이미지",
+          messageType: "IMAGE",
+          imageUrl,
+          sentAt: Date.now(),
+        };
+
+        client.publish({
+          destination: "/app/dm.send",
+          body: JSON.stringify(payload),
+        });
+        setMessages((prev) => [...prev, { ...payload, isRead: true }]);
+      }
+    } catch (error) {
+      console.error("이미지 전송 실패:", error);
+      alert(error.response?.data?.message || "이미지 전송에 실패했습니다.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   // 🔹 스크롤 자동 이동
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -98,7 +140,13 @@ const PrivateChat = () => {
           return (
             <div key={idx} className={`message-row ${isMine ? "my-message" : ""}`}>
               <div className="sender-name">{isMine ? "나" : msg.senderName}</div>
-              <div className="message-bubble">{msg.content}</div>
+              <div className={`message-bubble ${msg.messageType === "IMAGE" ? "image-bubble" : ""}`}>
+                {msg.messageType === "IMAGE" && msg.imageUrl ? (
+                  <img src={msg.imageUrl} alt={msg.content || "채팅 이미지"} />
+                ) : (
+                  msg.content
+                )}
+              </div>
             <div className="time">{msg.sentAt ? new Date(msg.sentAt).toLocaleTimeString() : ""}</div>
             </div>
           );
@@ -111,9 +159,11 @@ const PrivateChat = () => {
           value={input}
           onChange={e => setInput(e.target.value)}
           onKeyDown={e => e.key === "Enter" && sendMessage()}
-          placeholder="메시지 입력..."
+          onPaste={handlePaste}
+          placeholder={isUploading ? "이미지 업로드 중..." : "메시지 입력..."}
+          disabled={isUploading}
         />
-        <button onClick={sendMessage}>전송</button>
+        <button onClick={sendMessage} disabled={isUploading}>전송</button>
       </div>
     </div>
   );

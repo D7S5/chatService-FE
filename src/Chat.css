@@ -164,6 +164,25 @@
   border-color: rgba(88, 101, 242, 0.35);
 }
 
+.message-bubble.image-bubble {
+  padding: 4px;
+  overflow: hidden;
+}
+
+.message-bubble.image-bubble img {
+  display: block;
+  max-width: min(420px, 70vw);
+  max-height: 420px;
+  border-radius: 10px;
+  object-fit: contain;
+}
+
+.input-area input:disabled,
+.input-area button:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
 /* 입력 영역 */
 .input-area {
   margin-top: 14px;

@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import api from "../../api";
+import { getClipboardImages, uploadChatImage } from "../../chatImages";
 import { connectWebSocket, getClient } from "../../websocket";
 import "./ChatRoom.css";
 import ParticipantItem from "./ParticipantItem";
@@ -18,6 +19,7 @@ const ChatRoom = () => {
   const [currentCount, setCurrentCount] = useState(0);
   const [maxCount, setMaxCount] = useState(0);
   const [input, setInput] = useState("");
+  const [isUploading, setIsUploading] = useState(false);
   const [forcedExit, setForcedExit] = useState(null);
 
   const messageEndRef = useRef(null);
@@ -214,6 +216,43 @@ const ChatRoom = () => {
     setInput("");
   };
 
+  const handlePaste = async (event) => {
+    const images = getClipboardImages(event.clipboardData);
+    if (images.length === 0) return;
+
+    event.preventDefault();
+
+    const client = getClient();
+    if (!client?.connected) {
+      alert("채팅 서버에 연결되어 있지 않습니다.");
+      return;
+    }
+
+    setIsUploading(true);
+    try {
+      for (const image of images) {
+        const { imageUrl, originalFilename } = await uploadChatImage(image);
+        client.publish({
+          destination: "/app/chat.send",
+          body: JSON.stringify({
+            roomId,
+            senderId: userId,
+            senderName: username,
+            content: originalFilename || image.name || "이미지",
+            messageType: "IMAGE",
+            imageUrl,
+            sentAt: Date.now(),
+          }),
+        });
+      }
+    } catch (error) {
+      console.error("이미지 전송 실패:", error);
+      alert(error.response?.data?.message || "이미지 전송에 실패했습니다.");
+    } finally {
+      setIsUploading(false);
+    }
+  };
+
   const handleLeave = async () => {
     try {
       await api.delete(`/rooms/${roomId}/participants`);
@@ -340,7 +379,13 @@ const getTs = (m) => m.sentAt ?? m.createdAt;
                       {formatTime(msg.sentAt)}
                     </span>
                   )}
-                  <div className="bubble">{msg.content}</div>
+                  <div className={`bubble ${msg.messageType === "IMAGE" ? "image-bubble" : ""}`}>
+                    {msg.messageType === "IMAGE" && msg.imageUrl ? (
+                      <img src={msg.imageUrl} alt={msg.content || "채팅 이미지"} />
+                    ) : (
+                      msg.content
+                    )}
+                  </div>
                   {mine && showTime && (
                     <span className="time right">
                       {formatTime(msg.sentAt)}
@@ -375,9 +420,11 @@ const getTs = (m) => m.sentAt ?? m.createdAt;
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && sendMessage()}
-          placeholder="메시지를 입력하세요"
+          onPaste={handlePaste}
+          placeholder={isUploading ? "이미지 업로드 중..." : "메시지를 입력하세요"}
+          disabled={isUploading}
         />
-        <button onClick={sendMessage}>전송</button>
+        <button onClick={sendMessage} disabled={isUploading}>전송</button>
       </div>
     </div>
   );
