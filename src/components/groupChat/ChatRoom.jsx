@@ -21,6 +21,7 @@ const ChatRoom = () => {
   const [input, setInput] = useState("");
   const [isUploading, setIsUploading] = useState(false);
   const [forcedExit, setForcedExit] = useState(null);
+  const [enlargedImage, setEnlargedImage] = useState(null);
 
   const messageEndRef = useRef(null);
   const [roomType, setRoomType] = useState()
@@ -31,6 +32,22 @@ const ChatRoom = () => {
   const isPrivate = roomType === "PRIVATE";
   const canToggleSidebar = isPrivate && (isAdmin || isOwner)
   const [sidebarOpen, setSidebarOpen] = useState(true);
+
+  useEffect(() => {
+    if (!enlargedImage) return;
+
+    const handleKeyDown = (event) => {
+      if (event.key === "Escape") {
+        setEnlargedImage(null);
+      }
+    };
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [enlargedImage]);
 
   useEffect(() => {
     if (!userId || !username) {
@@ -270,6 +287,7 @@ const ChatRoom = () => {
   return d.toLocaleTimeString("ko-KR", {
     hour: "2-digit",
     minute: "2-digit",
+    second: "2-digit",
     hour12: false,
   });
 };
@@ -365,33 +383,33 @@ const getTs = (m) => m.sentAt ?? m.createdAt;
             const prev = messages[idx - 1];
 
             const showName = !mine && (!prev || prev.senderId !== msg.senderId);
-            const showTime =
-              !prev ||
-              prev.senderId !== msg.senderId ||
-              new Date(msg.sentAt) - new Date(prev.sentAt) > 60 * 1000;
 
             return (
               <div key={idx} className={`message ${mine ? "me" : "other"}`}>
                 {showName && <div className="sender">{msg.senderName}</div>}
                 <div className="bubble-row">
-                  {!mine && showTime && (
-                    <span className="time left">
-                      {formatTime(msg.sentAt)}
-                    </span>
-                  )}
                   <div className={`bubble ${msg.messageType === "IMAGE" ? "image-bubble" : ""}`}>
                     {msg.messageType === "IMAGE" && msg.imageUrl ? (
-                      <img src={msg.imageUrl} alt={msg.content || "채팅 이미지"} />
+                      <img
+                        src={msg.imageUrl}
+                        alt={msg.content || "채팅 이미지"}
+                        role="button"
+                        tabIndex={0}
+                        title="클릭하여 확대"
+                        onClick={() => setEnlargedImage(msg.imageUrl)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter" || event.key === " ") {
+                            event.preventDefault();
+                            setEnlargedImage(msg.imageUrl);
+                          }
+                        }}
+                      />
                     ) : (
                       msg.content
                     )}
                   </div>
-                  {mine && showTime && (
-                    <span className="time right">
-                      {formatTime(msg.sentAt)}
-                    </span>
-                  )}
                 </div>
+                <div className="time">{formatTime(getTs(msg))}</div>
               </div>
             );
           })}
@@ -426,6 +444,31 @@ const getTs = (m) => m.sentAt ?? m.createdAt;
         />
         <button onClick={sendMessage} disabled={isUploading}>전송</button>
       </div>
+
+      {enlargedImage && (
+        <div
+          className="image-preview-overlay"
+          role="dialog"
+          aria-modal="true"
+          aria-label="확대된 채팅 이미지"
+          onClick={() => setEnlargedImage(null)}
+        >
+          <button
+            type="button"
+            className="image-preview-close"
+            aria-label="이미지 닫기"
+            onClick={() => setEnlargedImage(null)}
+          >
+            ×
+          </button>
+          <img
+            className="image-preview"
+            src={enlargedImage}
+            alt="확대된 채팅 이미지"
+            onClick={(event) => event.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 };
