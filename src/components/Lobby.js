@@ -212,12 +212,14 @@ const loadDMRooms = async () => {
     }
   };
 
+  /* 친구 끊기 */
   const removeFriend = async (targetId) => {
   if (!window.confirm("정말 친구를 끊을까요?")) return;
 
   try {
     await api.delete(`/user/friends/${targetId}`);
     setFriends(prev => prev.filter(f => f.id !== targetId));
+    loadDMRooms();
   } catch {
     alert("친구 끊기 실패");
   }
